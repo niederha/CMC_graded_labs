@@ -148,7 +148,7 @@ def exercise1d():
     load = np.linspace(20.0,300.0,200)
 
     # Evalute for a single muscle stimulation
-    muscle_stimulation = 1.
+    muscle_stimulation = np.linspace(0.0,1.0,4)
 
     # Set the initial condition
     x0 = [0.0, sys.muscle.L_OPT,
@@ -165,29 +165,32 @@ def exercise1d():
     time_stabilize = 0.2
 
     time = np.arange(t_start, t_stop, time_step)
-    v_ce = []
-    tendon_force = []
-    # Run the integration
-    for i in range(0,len(load)):
-        result = sys.integrate(x0=x0,
-                               time=time,
-                               time_step=time_step,
-                               time_stabilize=time_stabilize,
-                               stimulation=muscle_stimulation,
-                               load=load[i])
-        tendon_force.append(result.tendon_force[-1])
-        if (result.l_mtc[-1] > (sys.muscle.L_OPT + sys.muscle.L_SLACK)):
-            v_ce.append(max(result.v_ce))
-        else:
-            v_ce.append(min(result.v_ce))
-
-    # Plotting
-    plt.figure('Isotonic muscle experiment, Contractile Velocity vs. Tendon Force')
-    plt.plot(tendon_force, v_ce)
-    plt.title('Isotonic muscle experiment, Contractile Velocity vs. Tendon Force')
-    plt.xlabel('Tendon force [N]')
-    plt.ylabel('Muscle contractile velocity [m/s]')
-    plt.grid()
+    
+    for s in range(0,len(muscle_stimulation)): 
+        v_ce = []
+        tendon_force = []
+        # Run the integration
+        for i in range(0,len(load)):
+            result = sys.integrate(x0=x0,
+                                   time=time,
+                                   time_step=time_step,
+                                   time_stabilize=time_stabilize,
+                                   stimulation=muscle_stimulation[s],
+                                   load=load[i])
+            tendon_force.append(result.tendon_force[-1])
+            if (result.l_mtc[-1] > (sys.muscle.L_OPT + sys.muscle.L_SLACK)):
+                v_ce.append(max(result.v_ce))
+            else:
+                v_ce.append(min(result.v_ce))
+    
+        # Plotting
+        plt.figure('Isotonic muscle experiment, Contractile Velocity vs. Tendon Force')
+        plt.plot(tendon_force, v_ce, label = 'stim = %0.1f'%muscle_stimulation[s])
+        plt.title('Isotonic muscle experiment, Contractile Velocity vs. Tendon Force')
+        plt.xlabel('Tendon force [N]')
+        plt.ylabel('Muscle contractile velocity [m/s]')
+        plt.grid()
+        plt.legend()
     
     plt.figure('Isotonic muscle experiment, Contractile Velocity vs. Time')
     plt.plot(result.time, result.v_ce)
