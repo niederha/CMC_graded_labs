@@ -142,9 +142,9 @@ class IsometricMuscleSystem(object):
             muscle_length = self.muscle.L_OPT + self.muscle.L_SLACK
 
         #: Integration
-        pylog.info(
-            "Begin isometric test with muscle stretch {} and "
-            "muscle activation {}".format(muscle_length, stimulation))
+#        pylog.info(
+#            "Begin isometric test with muscle stretch {} and "
+#            "muscle activation {}".format(muscle_length, stimulation))
         #: Instatiate the muscle results container
         self.muscle.instantiate_result_from_state(time)
 

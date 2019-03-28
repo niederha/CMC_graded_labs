@@ -34,9 +34,11 @@ def exercise1a():
     To do so, you will have to keep the muscle at a constant length and
     observe the force while stimulating the muscle at a constant activation."""
     plt.close('all')
+    plt.rcParams['figure.figsize'] = [9, 6]
     # Defination of muscles
     parameters = MuscleParameters()
-    pylog.warning("Loading default muscle parameters")
+    parameters.l_opt = 0.05 # and 0.5
+    #pylog.warning("Loading default muscle parameters")
     pylog.info(parameters.showParameters())
     pylog.info("Use the parameters object to change the muscle parameters")
 
@@ -59,7 +61,7 @@ def exercise1a():
     muscle_stretch = np.linspace(0.2,1.3,100)
     muscle_stretch = muscle_stretch*(sys.muscle.L_OPT+sys.muscle.L_SLACK)
     # Evalute for a single muscle stimulation
-    muscle_stimulation = np.linspace(0.0,1.0,4)
+    muscle_stimulation = np.linspace(1.0,1.0,1)
 
     # Set the initial condition
     x0 = [0.0, sys.muscle.L_OPT]
@@ -99,8 +101,8 @@ def exercise1a():
 #    plt.grid()
     
         plt.figure('Isometric muscle experiment, Force vs Length')
-        plt.plot(l_ce, active_force, label='act F, stim ='+str(s))
-        plt.plot(l_ce, passive_force, label='pass F, stim ='+str(s))
+        plt.plot(l_ce, active_force, label='act F, stim = %0.1f'%muscle_stimulation[s])
+        plt.plot(l_ce, passive_force, label='pass F, stim = %0.1f' %muscle_stimulation[s])
         plt.title('Isometric muscle experiment, Force vs Length')
         plt.xlabel('Contractile Element Length [m]')
         plt.ylabel('Muscle Force [N]')
