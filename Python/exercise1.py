@@ -56,10 +56,10 @@ def exercise1a():
 
     # Evalute for a single muscle stretch
     #muscle_stretch = np.array([0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4])
-    muscle_stretch = np.linspace(0.2,1.5,100)
+    muscle_stretch = np.linspace(0.2,1.3,100)
     muscle_stretch = muscle_stretch*(sys.muscle.L_OPT+sys.muscle.L_SLACK)
     # Evalute for a single muscle stimulation
-    muscle_stimulation = 1.
+    muscle_stimulation = np.linspace(0.0,1.0,4)
 
     # Set the initial condition
     x0 = [0.0, sys.muscle.L_OPT]
@@ -73,19 +73,21 @@ def exercise1a():
 
     time = np.arange(t_start, t_stop, time_step)
 
-    l_ce = []
-    active_force = []
-    passive_force = []
+
     # Run the integration
-    for i in range(0,len(muscle_stretch)):
-        result = sys.integrate(x0=x0,
-                           time=time,
-                           time_step=time_step,
-                           stimulation=muscle_stimulation,
-                           muscle_length=muscle_stretch[i])
-        l_ce.append(result.l_ce[-1])
-        active_force.append(result.active_force[-1])
-        passive_force.append(result.passive_force[-1])
+    for s in range(0,len(muscle_stimulation)): 
+        l_ce = []
+        active_force = []
+        passive_force = []
+        for i in range(0,len(muscle_stretch)):
+            result = sys.integrate(x0=x0,
+                               time=time,
+                               time_step=time_step,
+                               stimulation=muscle_stimulation[s],
+                               muscle_length=muscle_stretch[i])
+            l_ce.append(result.l_ce[-1])
+            active_force.append(result.active_force[-1])
+            passive_force.append(result.passive_force[-1])
 
     # Plotting
 #    plt.figure('Isometric muscle experiment, Force vs Time')
@@ -96,14 +98,14 @@ def exercise1a():
 #    plt.ylabel('Muscle Force')
 #    plt.grid()
     
-    plt.figure('Isometric muscle experiment, Force vs Length')
-    plt.plot(l_ce, active_force, label='active Force')
-    plt.plot(l_ce, passive_force, label='passive Force')
-    plt.title('Isometric muscle experiment, Force vs Length')
-    plt.xlabel('Contractile Element Length [m]')
-    plt.ylabel('Muscle Force [N]')
-    plt.grid()
-    plt.legend()
+        plt.figure('Isometric muscle experiment, Force vs Length')
+        plt.plot(l_ce, active_force, label='act F, stim ='+str(s))
+        plt.plot(l_ce, passive_force, label='pass F, stim ='+str(s))
+        plt.title('Isometric muscle experiment, Force vs Length')
+        plt.xlabel('Contractile Element Length [m]')
+        plt.ylabel('Muscle Force [N]')
+        plt.grid()
+        plt.legend()
 
 
 def exercise1d():
