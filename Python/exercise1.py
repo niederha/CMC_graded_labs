@@ -56,6 +56,36 @@ def find_ce_stretch_iso(ce_stretch, t_start, t_stop, dt, stimulation=1, error_ma
     return stretch
 
 
+def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch, title, x_label, handle=None):
+
+    force_labels = ['Active', 'Passive', 'Total']
+    if handle is None:
+        handle = title
+
+    plt.figure(handle)
+    plt.plot(stretch, active_force)
+    plt.plot(stretch, passive_force)
+    plt.plot(stretch, total_force)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel('Force [N]')
+    plt.legend(force_labels)
+    plt.grid()
+
+
+def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc):
+
+    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
+                              'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [-]')
+    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
+                              'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [-]')
+    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
+                              'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [-]')
+
+
+
+
+
 def exercise1a():
     """ Exercise 1a
     The goal of this exercise is to understand the relationship
@@ -82,15 +112,19 @@ def exercise1a():
     muscle_stimulation = 1.
     ce_stretch_max = 2.
     nb_pts = 1000
+    l_ce_ini = sys.muscle.L_OPT
+    l_slack_ini = sys.muscle.L_SLACK
+    l_mtc_ini = l_ce_ini + l_slack_ini
     muscle_stretch_max = find_ce_stretch_iso(ce_stretch_max, t_start, t_stop, time_step)
     stretches = np.arange(0, muscle_stretch_max, muscle_stretch_max/nb_pts)
     x0 = [0.0, sys.muscle.L_OPT+sys.muscle.L_SLACK]
+
 
     active_force = []
     passive_force = []
     total_force = []
     l_ce = []
-    l_t = []
+    l_slack = []
     l_mtc = []
 
     for stretch in stretches:
@@ -102,17 +136,12 @@ def exercise1a():
         active_force.append(result.active_force[-1])
         passive_force.append(result.passive_force[-1])
         total_force.append(result.tendon_force[-1])
-        l_ce.append(result.l_ce[-1])
-        l_mtc.append(result.l_mtc[-1])
-        l_t.append(l_mtc[-1]-l_ce[-1])
+        l_ce.append(result.l_ce[-1]/l_ce_ini)
+        l_mtc.append(result.l_mtc[-1]/l_mtc_ini)
+        l_slack.append(result.l_mtc[-1]-result.l_ce[-1]/l_slack_ini)
 
     # Plotting
-    plt.figure('Isometric muscle experiment')
-    plt.plot(result.time, result.tendon_force)
-    plt.title('Isometric muscle experiment')
-    plt.xlabel('Time [s]')
-    plt.ylabel('Muscle Force')
-    plt.grid()
+    plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc)
 
 
 def exercise1d():
