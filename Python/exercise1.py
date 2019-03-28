@@ -33,8 +33,7 @@ def exercise1a():
     Here you will re-create the isometric muscle contraction experiment.
     To do so, you will have to keep the muscle at a constant length and
     observe the force while stimulating the muscle at a constant activation."""
-    plt.close('all')
-    plt.rcParams['figure.figsize'] = [9, 6]
+
     # Defination of muscles
     parameters = MuscleParameters()
     parameters.l_opt = 0.05 # and 0.5
@@ -115,7 +114,7 @@ def exercise1d():
 
     Under isotonic conditions external load is kept constant.
     A constant stimulation is applied and then suddenly the muscle
-    is allowed contract. The instantaneous velocity at which the muscle
+    is allowed to contract. The instantaneous velocity at which the muscle
     contracts is of our interest."""
 
     # Defination of muscles
@@ -146,7 +145,7 @@ def exercise1d():
     # >>> sys.muscle.L_OPT # To get the muscle optimal length
 
     # Evalute for a single load
-    load = 100.
+    load = np.linspace(20.0,300.0,200)
 
     # Evalute for a single muscle stimulation
     muscle_stimulation = 1.
@@ -166,26 +165,41 @@ def exercise1d():
     time_stabilize = 0.2
 
     time = np.arange(t_start, t_stop, time_step)
-
+    v_ce = []
+    tendon_force = []
     # Run the integration
-    result = sys.integrate(x0=x0,
-                           time=time,
-                           time_step=time_step,
-                           time_stabilize=time_stabilize,
-                           stimulation=muscle_stimulation,
-                           load=load)
-
+    for i in range(0,len(load)):
+        result = sys.integrate(x0=x0,
+                               time=time,
+                               time_step=time_step,
+                               time_stabilize=time_stabilize,
+                               stimulation=muscle_stimulation,
+                               load=load[i])
+        tendon_force.append(result.tendon_force[-1])
+        if (result.l_mtc[-1] > (sys.muscle.L_OPT + sys.muscle.L_SLACK)):
+            v_ce.append(max(result.v_ce))
+        else:
+            v_ce.append(min(result.v_ce))
 
     # Plotting
-    plt.figure('Isotonic muscle experiment')
+    plt.figure('Isotonic muscle experiment, Contractile Velocity vs. Tendon Force')
+    plt.plot(tendon_force, v_ce)
+    plt.title('Isotonic muscle experiment, Contractile Velocity vs. Tendon Force')
+    plt.xlabel('Tendon force [N]')
+    plt.ylabel('Muscle contractile velocity [m/s]')
+    plt.grid()
+    
+    plt.figure('Isotonic muscle experiment, Contractile Velocity vs. Time')
     plt.plot(result.time, result.v_ce)
-    plt.title('Isotonic muscle experiment')
-    plt.xlabel('Time [s]')
-    plt.ylabel('Muscle contractilve velocity')
+    plt.title('Isotonic muscle experiment, Contractile Velocity vs. Time')
+    plt.xlabel('Tendon force [N]')
+    plt.ylabel('Muscle contractile velocity [m/s]')
     plt.grid()
 
 def exercise1():
-    exercise1a()
+    plt.close('all')
+    plt.rcParams['figure.figsize'] = [9, 6]
+    #exercise1a()
     exercise1d()
 
     if DEFAULT["save_figures"] is False:
