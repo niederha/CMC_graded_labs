@@ -26,6 +26,36 @@ plt.rc('ytick', labelsize=14.0)    # fontsize of the tick labels
 DEFAULT["save_figures"] = True
 
 
+def find_ce_stretch_iso(ce_stretch, t_start, t_stop, dt, stimulation=1, error_max=0.01):
+    """Finds the total relative stretch to apply to obtain ce_stretch in isometric mode"""
+    stretch = error_max
+
+    # Muscle definition
+    parameters = MuscleParameters()
+    muscle = Muscle(parameters)
+    sys = IsometricMuscleSystem()
+    sys.add_muscle(muscle)
+
+    # Simulation parameters
+    x0 = [0.0, sys.muscle.L_OPT]
+    time = np.arange(t_start, t_stop, dt)
+
+    while True:
+        result = sys.integrate(x0=x0,
+                               time=time,
+                               time_step=dt,
+                               stimulation=stimulation,
+                               muscle_length=stretch * (sys.muscle.L_OPT+sys.muscle.L_SLACK))
+        if result.l_ce[-1]/sys.muscle.L_OPT > ce_stretch:
+            pylog.info("Reaches l_ce stretch " + str(result.l_ce[-1]/sys.muscle.L_OPT) + " for total stretch of:" +
+                       str(stretch))
+            break
+        else:
+            stretch += error_max
+
+    return stretch
+
+
 def exercise1a():
     """ Exercise 1a
     The goal of this exercise is to understand the relationship
