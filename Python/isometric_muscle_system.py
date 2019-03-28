@@ -19,34 +19,11 @@ class IsometricMuscleSystem(object):
     """
 
     def __init__(self):
-        """ Initialization.
-        Parameters
-        ----------
-        None
-
-        Example:
-        -------
-        >>> isometric_system = IsometricMuscleSystem()
-        """
         super(IsometricMuscleSystem, self).__init__()
         self.muscle = None
 
     def add_muscle(self, muscle):
-        """Add the muscle model to the system.
-
-        Parameters
-        ----------
-        muscle: <Muscle>
-            Instance of muscle model
-
-        Example:
-        --------
-        >>> from muscle import Muscle
-        >>> from system_parameters import MuscleParameters
-        >>> muscle = Muscle(MuscleParameters()) #: Default muscle
-        >>> isometric_system = IsometricMuscleSystem()
-        >>> isometric_system.add_muscle(muscle)
-        """
+        
         if self.muscle is not None:
             pylog.warning(
                 'You have already added the muscle model to the system.')
