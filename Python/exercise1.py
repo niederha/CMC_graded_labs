@@ -64,50 +64,47 @@ def exercise1a():
     To do so, you will have to keep the muscle at a constant length and
     observe the force while stimulating the muscle at a constant activation."""
 
-    # Definition of muscles
-    parameters = MuscleParameters()
-    pylog.warning("Loading default muscle parameters")
-    pylog.info(parameters.showParameters())
-    pylog.info("Use the parameters object to change the muscle parameters")
-
-    # Create muscle object
-    muscle = Muscle(parameters)
-
-    pylog.warning("Isometric muscle contraction to be completed")
-
-    # Instatiate isometric muscle system
-    sys = IsometricMuscleSystem()
-
-    # Add the muscle to the system
-    sys.add_muscle(muscle)
-
-    # You can still access the muscle inside the system by doing
-    # >>> sys.muscle.L_OPT # To get the muscle optimal length
-
-    # Evaluate for a single muscle stretch
-    muscle_stretch = 0.2
-
-    # Evaluate for a single muscle stimulation
-    muscle_stimulation = 1.
-
-    # Set the initial condition
-    x0 = [0.0, sys.muscle.L_OPT]
-    # x0[0] --> muscle stimulation initial value
-    # x0[1] --> muscle contractile length initial value
-
-    # Set the time for integration
+    # Simulation parameters
     t_start = 0.0
     t_stop = 0.2
     time_step = 0.001
-
     time = np.arange(t_start, t_stop, time_step)
 
-    # Run the integration
-    result = sys.integrate(x0=x0,
-                           time=time,
-                           time_step=time_step,
-                           stimulation=muscle_stimulation,
-                           muscle_length=muscle_stretch)
+    # Definition of system
+    parameters = MuscleParameters()
+    pylog.warning("Loading default muscle parameters")
+    pylog.info(parameters.showParameters())
+    muscle = Muscle(parameters)
+    sys = IsometricMuscleSystem()
+    sys.add_muscle(muscle)
+
+    # Experiences parameters
+    muscle_stimulation = 1.
+    ce_stretch_max = 2.
+    nb_pts = 1000
+    muscle_stretch_max = find_ce_stretch_iso(ce_stretch_max, t_start, t_stop, time_step)
+    stretches = np.arange(0, muscle_stretch_max, muscle_stretch_max/nb_pts)
+    x0 = [0.0, sys.muscle.L_OPT+sys.muscle.L_SLACK]
+
+    active_force = []
+    passive_force = []
+    total_force = []
+    l_ce = []
+    l_t = []
+    l_mtc = []
+
+    for stretch in stretches:
+        result = sys.integrate(x0=x0,
+                               time=time,
+                               time_step=time_step,
+                               stimulation=muscle_stimulation,
+                               muscle_length=stretch * (x0[1]))
+        active_force.append(result.active_force[-1])
+        passive_force.append(result.passive_force[-1])
+        total_force.append(result.tendon_force[-1])
+        l_ce.append(result.l_ce[-1])
+        l_mtc.append(result.l_mtc[-1])
+        l_t.append(l_mtc[-1]-l_ce[-1])
 
     # Plotting
     plt.figure('Isometric muscle experiment')
@@ -193,8 +190,9 @@ def exercise1d():
 
 
 def exercise1():
+    plt.close("all")
     exercise1a()
-    exercise1d()
+    # exercise1d()
 
     if DEFAULT["save_figures"] is False:
         plt.show()
