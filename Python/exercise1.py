@@ -34,7 +34,7 @@ def exercise1a():
     To do so, you will have to keep the muscle at a constant length and
     observe the force while stimulating the muscle at a constant activation."""
 
-    # Defination of muscles
+    # Definition of muscles
     parameters = MuscleParameters()
     pylog.warning("Loading default muscle parameters")
     pylog.info(parameters.showParameters())
@@ -54,16 +54,16 @@ def exercise1a():
     # You can still access the muscle inside the system by doing
     # >>> sys.muscle.L_OPT # To get the muscle optimal length
 
-    # Evalute for a single muscle stretch
+    # Evaluate for a single muscle stretch
     muscle_stretch = 0.2
 
-    # Evalute for a single muscle stimulation
+    # Evaluate for a single muscle stimulation
     muscle_stimulation = 1.
 
     # Set the initial condition
     x0 = [0.0, sys.muscle.L_OPT]
-    # x0[0] --> muscle stimulation intial value
-    # x0[1] --> muscle contracticle length initial value
+    # x0[0] --> muscle stimulation initial value
+    # x0[1] --> muscle contractile length initial value
 
     # Set the time for integration
     t_start = 0.0
@@ -96,7 +96,7 @@ def exercise1d():
     is allowed contract. The instantaneous velocity at which the muscle
     contracts is of our interest."""
 
-    # Defination of muscles
+    # Definition of muscles
     muscle_parameters = MuscleParameters()
     print(muscle_parameters.showParameters())
 
@@ -111,7 +111,7 @@ def exercise1d():
 
     pylog.warning("Isotonic muscle contraction to be implemented")
 
-    # Instatiate isotonic muscle system
+    # Instantiate isotonic muscle system
     sys = IsotonicMuscleSystem()
 
     # Add the muscle to the system
@@ -123,10 +123,10 @@ def exercise1d():
     # You can still access the muscle inside the system by doing
     # >>> sys.muscle.L_OPT # To get the muscle optimal length
 
-    # Evalute for a single load
+    # Evaluate for a single load
     load = 100.
 
-    # Evalute for a single muscle stimulation
+    # Evaluate for a single muscle stimulation
     muscle_stimulation = 1.
 
     # Set the initial condition
@@ -153,7 +153,6 @@ def exercise1d():
                            stimulation=muscle_stimulation,
                            load=load)
 
-
     # Plotting
     plt.figure('Isotonic muscle experiment')
     plt.plot(result.time, result.v_ce)
@@ -161,6 +160,7 @@ def exercise1d():
     plt.xlabel('Time [s]')
     plt.ylabel('Muscle contractilve velocity')
     plt.grid()
+
 
 def exercise1():
     exercise1a()
