@@ -8,12 +8,9 @@ import os
 from .default import DEFAULT
 
 
-def save_figure(figure, name=None, file=None):
+def save_figure(figure, name=None):
     """ Save figure """
-    if file is None:
-        path = os.getcwd()+"\\"
-    else:
-        path = file+"\\"
+    path = DEFAULT["save_folder"]
 
     if DEFAULT["save_figures"]:
         for extension in DEFAULT["save_extensions"]:
