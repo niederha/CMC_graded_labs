@@ -8,9 +8,13 @@ import os
 from .default import DEFAULT
 
 
-def save_figure(figure, name=None):
+def save_figure(figure, name=None, file=None):
     """ Save figure """
-    path = os.getcwd()+"\\"
+    if file is None:
+        path = os.getcwd()+"\\"
+    else:
+        path = file+"\\"
+
     if DEFAULT["save_figures"]:
         for extension in DEFAULT["save_extensions"]:
             fig = figure.replace(" ", "_").replace(".", "dot")

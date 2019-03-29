@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+import os
 import cmc_pylog as pylog
 from muscle import Muscle
 from mass import Mass
@@ -23,6 +24,7 @@ plt.rc('axes', labelsize=14.0)      # fontsize of the x and y labels
 plt.rc('xtick', labelsize=14.0)     # fontsize of the tick labels
 plt.rc('ytick', labelsize=14.0)     # fontsize of the tick labels
 plt.figure(figsize=(8.0, 5.0))      # figure size in inches
+figure_folder = os.getcwd().replace("Python", "Figures")
 
 
 def find_ce_stretch_iso(ce_stretch, t_start, t_stop, dt, stimulation=1, error_max=0.01):
@@ -232,7 +234,7 @@ def exercise1():
         pylog.debug("Saving figures:\n{}".format(figures))
         for fig in figures:
             plt.figure(fig)
-            save_figure(fig)
+            save_figure(fig, file=figure_folder)
         plt.show()
 
 
