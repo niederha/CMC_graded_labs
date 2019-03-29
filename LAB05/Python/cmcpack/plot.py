@@ -3,12 +3,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cmc_pylog as pylog
+import os
 
 from .default import DEFAULT
 
 
 def save_figure(figure, name=None):
     """ Save figure """
+    path = os.getcwd()+"\\"
     if DEFAULT["save_figures"]:
         for extension in DEFAULT["save_extensions"]:
             fig = figure.replace(" ", "_").replace(".", "dot")
@@ -16,12 +18,8 @@ def save_figure(figure, name=None):
                 name = "{}.{}".format(fig, extension)
             else:
                 name = "{}.{}".format(name, extension)
-            fig = plt.figure(figure)
-            size = plt.rcParams.get('figure.figsize')
-            fig.set_size_inches(0.7*size[0], 0.7*size[1], forward=True)
-            plt.savefig(name, bbox_inches='tight')
+            plt.savefig(path+name, bbox_inches='tight')
             pylog.debug("Saving figure {}...".format(name))
-            fig.set_size_inches(size[0], size[1], forward=True)
 
 
 def bioplot(data_x, data_y, **kwargs):

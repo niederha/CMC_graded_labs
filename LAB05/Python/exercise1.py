@@ -18,12 +18,11 @@ DEFAULT["label"] = [r"$\theta$ [rad]", r"$d\theta/dt$ [rad/s]"]
 # You may change as per your requirement
 plt.rc('lines', linewidth=2.0)
 plt.rc('font', size=12.0)
-plt.rc('axes', titlesize=14.0)     # fontsize of the axes title
-plt.rc('axes', labelsize=14.0)    # fontsize of the x and y labels
-plt.rc('xtick', labelsize=14.0)    # fontsize of the tick labels
-plt.rc('ytick', labelsize=14.0)    # fontsize of the tick labels
-
-DEFAULT["save_figures"] = True
+plt.rc('axes', titlesize=14.0)      # fontsize of the axes title
+plt.rc('axes', labelsize=14.0)      # fontsize of the x and y labels
+plt.rc('xtick', labelsize=14.0)     # fontsize of the tick labels
+plt.rc('ytick', labelsize=14.0)     # fontsize of the tick labels
+plt.figure(figsize=(8.0, 5.0))      # figure size in inches
 
 
 def find_ce_stretch_iso(ce_stretch, t_start, t_stop, dt, stimulation=1, error_max=0.01):
@@ -63,9 +62,9 @@ def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch,
         handle = title
 
     plt.figure(handle)
-    plt.plot(stretch, total_force)
     plt.plot(stretch, active_force)
     plt.plot(stretch, passive_force)
+    plt.plot(stretch, total_force)
 
     plt.title(title)
     plt.xlabel(x_label)
@@ -77,11 +76,14 @@ def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch,
 def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc):
 
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
-                              'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]')
+                              'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
+                              handle="iso_l_ce_v_str")
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
-                              'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]')
+                              'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
+                              handle="iso_l_sl_v_str")
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
-                              'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]')
+                              'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
+                              handle="iso_l_mtc_v_str")
 
 
 def exercise1a():
@@ -91,6 +93,8 @@ def exercise1a():
     Here you will re-create the isometric muscle contraction experiment.
     To do so, you will have to keep the muscle at a constant length and
     observe the force while stimulating the muscle at a constant activation."""
+
+    pylog.info("Part a")
 
     # Simulation parameters
     t_start = 0.0
@@ -215,9 +219,11 @@ def exercise1d():
 
 def exercise1():
     plt.close("all")
+    pylog.info("Start exercise 1")
     exercise1a()
     # exercise1d()
 
+    print(DEFAULT["save_figures"])
     if DEFAULT["save_figures"] is False:
         plt.show()
     else:
@@ -227,11 +233,10 @@ def exercise1():
         for fig in figures:
             plt.figure(fig)
             save_figure(fig)
-            plt.close(fig)
+        plt.show()
 
 
 if __name__ == '__main__':
-    from cmcpack import parse_args
-    parse_args()
+    # parse_args()
     exercise1()
 
