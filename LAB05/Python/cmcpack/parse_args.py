@@ -17,7 +17,8 @@ def parse_args(**kwargs):
         "--save_figures", "-s",
         help="Save all figures",
         dest="save_figures",
-        action="store_true"
+        action="store_true",
+        default=True
     )
     extension_support = "png/pdf/ps/eps/svg/..."
     extension_usage = "-e png -e pdf ..."
@@ -28,7 +29,8 @@ def parse_args(**kwargs):
             extension_usage
         ),
         dest="extension",
-        action="append"
+        action="append",
+        default=["png"]
     )
     args = parser.parse_args()
     DEFAULT["save_figures"] = args.save_figures

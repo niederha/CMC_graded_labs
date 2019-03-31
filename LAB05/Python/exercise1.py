@@ -6,7 +6,7 @@ import numpy as np
 import cmc_pylog as pylog
 from muscle import Muscle
 from mass import Mass
-from cmcpack import DEFAULT
+from cmcpack import DEFAULT, parse_args
 from cmcpack.plot import save_figure
 from system_parameters import MuscleParameters, MassParameters
 from isometric_muscle_system import IsometricMuscleSystem
@@ -238,5 +238,6 @@ def exercise1():
 
 
 if __name__ == '__main__':
+    parse_args()
     exercise1()
 
