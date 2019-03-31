@@ -25,8 +25,17 @@ plt.rc('ytick', labelsize=14.0)     # fontsize of the tick labels
 plt.figure(figsize=(8.0, 5.0))      # figure size in inches
 
 
+class TimeParameters:
 
-def find_ce_stretch_iso(ce_stretch, t_start, t_stop, dt, stimulation=1, error_max=0.01):
+    """Used to pass the time infos for the simulation in an easier way"""
+    def __init__(self, t_start=0.0, t_stop=0.2, t_step=0.001):
+        self.t_start = t_start
+        self.t_stop = t_stop
+        self.step = t_step
+        self.times = np.arange(self.t_start, self.t_stop, self.step)
+
+
+def find_ce_stretch_iso(ce_stretch, time_param, stimulation=1, error_max=0.01):
     """Finds the total relative stretch to apply to obtain ce_stretch in isometric mode"""
     stretch = error_max
 
@@ -38,12 +47,11 @@ def find_ce_stretch_iso(ce_stretch, t_start, t_stop, dt, stimulation=1, error_ma
 
     # Simulation parameters
     x0 = [0.0, sys.muscle.L_OPT]
-    time = np.arange(t_start, t_stop, dt)
 
     while True:
         result = sys.integrate(x0=x0,
-                               time=time,
-                               time_step=dt,
+                               time=time_param.times,
+                               time_step=time_param.step,
                                stimulation=stimulation,
                                muscle_length=stretch * (sys.muscle.L_OPT+sys.muscle.L_SLACK))
         if result.l_ce[-1]/sys.muscle.L_OPT > ce_stretch:
@@ -87,6 +95,46 @@ def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack,
                               handle="iso_l_mtc_v_str")
 
 
+def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
+                   time_param=TimeParameters()):
+
+    # System definition
+    parameters = MuscleParameters()
+    pylog.info(parameters.showParameters())
+    muscle = Muscle(parameters)
+    sys = IsometricMuscleSystem()
+    sys.add_muscle(muscle)
+
+    # Experiment parameters
+    muscle_stretch_max = find_ce_stretch_iso(ce_stretch_max, time_param)
+    muscle_stretch_min = find_ce_stretch_iso(ce_stretch_min, time_param)
+    stretches = np.arange(muscle_stretch_min, muscle_stretch_max, muscle_stretch_max / nb_pts)
+    x0 = [0.0, sys.muscle.L_OPT + sys.muscle.L_SLACK]
+
+    # Containers
+    active_force = []
+    passive_force = []
+    total_force = []
+    l_ce = []
+    l_slack = []
+    l_mtc = []
+
+    # Experiences
+    for stretch in stretches:
+        result = sys.integrate(x0=x0,
+                               time=time_param.times,
+                               time_step=time_param.step,
+                               stimulation=muscle_stimulation,
+                               muscle_length=stretch * (x0[1]))
+        active_force.append(result.active_force[-1])
+        passive_force.append(result.passive_force[-1])
+        total_force.append(result.tendon_force[-1])
+        l_ce.append(result.l_ce[-1])
+        l_mtc.append(result.l_mtc[-1])
+        l_slack.append(result.l_mtc[-1]-result.l_ce[-1])
+
+    return active_force, passive_force, total_force, l_ce, l_slack, l_mtc
+
 def exercise1a():
     """ Exercise 1a
     The goal of this exercise is to understand the relationship
@@ -97,48 +145,16 @@ def exercise1a():
 
     pylog.info("Part a")
 
-    # Simulation parameters
-    t_start = 0.0
-    t_stop = 0.2
-    time_step = 0.001
-    time = np.arange(t_start, t_stop, time_step)
-
-    # Definition of system
-    parameters = MuscleParameters()
-    pylog.warning("Loading default muscle parameters")
-    pylog.info(parameters.showParameters())
-    muscle = Muscle(parameters)
-    sys = IsometricMuscleSystem()
-    sys.add_muscle(muscle)
-
-    # Experiences parameters
+    # Parameters
     muscle_stimulation = 1.
-    ce_stretch_max = 1.5
-    muscle_stretch_min = 0.5
+    ce_stretch_max = 1.
+    ce_stretch_min = 0.5
     nb_pts = 1000
-    muscle_stretch_max = find_ce_stretch_iso(ce_stretch_max, t_start, t_stop, time_step)
-    stretches = np.arange(muscle_stretch_min, muscle_stretch_max, muscle_stretch_max/nb_pts)
-    x0 = [0.0, sys.muscle.L_OPT+sys.muscle.L_SLACK]
+    time_param = TimeParameters(0.0, 0.2, 0.001)
 
-    active_force = []
-    passive_force = []
-    total_force = []
-    l_ce = []
-    l_slack = []
-    l_mtc = []
-
-    for stretch in stretches:
-        result = sys.integrate(x0=x0,
-                               time=time,
-                               time_step=time_step,
-                               stimulation=muscle_stimulation,
-                               muscle_length=stretch * (x0[1]))
-        active_force.append(result.active_force[-1])
-        passive_force.append(result.passive_force[-1])
-        total_force.append(result.tendon_force[-1])
-        l_ce.append(result.l_ce[-1])
-        l_mtc.append(result.l_mtc[-1])
-        l_slack.append(result.l_mtc[-1]-result.l_ce[-1])
+    # Experiment
+    active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(muscle_stimulation, ce_stretch_max,
+                                                                                    ce_stretch_min, nb_pts, time_param)
 
     # Plotting
     plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc)
