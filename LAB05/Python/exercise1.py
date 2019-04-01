@@ -82,17 +82,23 @@ def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch,
     plt.grid()
 
 
+def add_force_to_plot(handle, force, l, legend):
+    plt.figure(handle)
+    plt.plot(l, force)
+    plt.legend(legend)
+    plt.grid()
+
 def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc):
 
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
                               'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
-                              handle="iso_l_ce_v_str")
+                              handle="1_a_lce_vs_str")
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
                               'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
-                              handle="iso_l_sl_v_str")
+                              handle="1_a_lsl_vs_str")
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
                               'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
-                              handle="iso_l_mtc_v_str")
+                              handle="1_a_lmtc_vs_str")
 
 
 def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
@@ -135,7 +141,7 @@ def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5,
 
     return active_force, passive_force, total_force, l_ce, l_slack, l_mtc
 
-def exercise1a():
+def exercise1a(time_param):
     """ Exercise 1a
     The goal of this exercise is to understand the relationship
     between muscle length and tension.
@@ -143,22 +149,61 @@ def exercise1a():
     To do so, you will have to keep the muscle at a constant length and
     observe the force while stimulating the muscle at a constant activation."""
 
+    # region part_a
     pylog.info("Part a")
-
     # Parameters
     muscle_stimulation = 1.
-    ce_stretch_max = 1.
+    ce_stretch_max = 1.5
     ce_stretch_min = 0.5
     nb_pts = 1000
-    time_param = TimeParameters(0.0, 0.2, 0.001)
 
     # Experiment
     active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(muscle_stimulation, ce_stretch_max,
                                                                                     ce_stretch_min, nb_pts, time_param)
-
     # Plotting
     plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc)
+    # endregion
 
+
+def exercise1b(time_param):
+    pylog.info("part b")
+
+    # region Parameters
+    ce_stretch_max = 1.5
+    ce_stretch_min = 0.5
+    nb_pts = 1000
+    muscle_stimulation_min = 0
+    muscle_stimulation_max = 1
+    step_stimulation = 0.25
+    stimulations = np.arange(muscle_stimulation_min, muscle_stimulation_max, step_stimulation)
+    # endregion
+
+    # region Figure initialisation
+    figure_handles = ["1_b_lce_stimulation", "1_b_lsl_stimulation", "1_b_lmtc_stimulation"]
+    figure_titles = ["Stimulation variation CE stretch vs force", "Stimulation variation SLACK stretch vs force",
+                     "Stimulation variation total stretch vs force"]
+    figure_x_label = ["CE stretch [m]", "SLACK stretch [m]", "TOTAL stretch [m]"]
+    for handle, title, x_label in zip(figure_handles, figure_titles, figure_x_label):
+        plt.figure(handle)
+        plt.title(title)
+        plt.xlabel(x_label)
+        plt.ylabel('Force [N]')
+        plt.grid()
+    # endregion
+
+    # region Experiences
+    for stim in stimulations:
+        active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(stim,
+                                                                                        ce_stretch_max,
+                                                                                        ce_stretch_min, nb_pts,
+                                                                                        time_param)
+        lengths = [l_ce, l_slack, l_mtc]
+
+        # Plots
+        for handle, length in zip(figure_handles, lengths):
+            add_force_to_plot(handle, passive_force, length, " Passive force, stimulation ={}".format(stim))
+            add_force_to_plot(handle, active_force, length, " Active force, stimulation ={}".format(stim))
+    # endregion
 
 def exercise1d():
     """ Exercise 1d
@@ -237,7 +282,10 @@ def exercise1d():
 def exercise1():
     plt.close("all")
     pylog.info("Start exercise 1")
-    exercise1a()
+    time_param = TimeParameters(0.0, 0.2, 0.001)
+
+    # exercise1a(time_param)
+    exercise1b(time_param)
     # exercise1d()
 
     print(DEFAULT["save_figures"])
