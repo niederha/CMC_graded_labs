@@ -22,7 +22,7 @@ from system_parameters import (MuscleParameters, NetworkParameters,
                                PendulumParameters)
 from system_simulation import SystemSimulation
 
-
+plt.close("all")
 # Global settings for plotting
 # You may change as per your requirement
 plt.rc('lines', linewidth=2.0)
@@ -46,6 +46,35 @@ def exercise2():
     -------
         None
     """
+    # 2a
+    theta = np.linspace(-np.pi/4, np.pi/4,num=50)
+    h1=[]
+    a1= 1
+    a2a1=np.linspace(0.5,2,num=4)
+
+    plt.figure('Muscle Length vs Theta')    
+    plt.title('Muscle Length vs Theta')
+    plt.xlabel('Position [rad]')
+    plt.ylabel('Muscle length [m]')
+    plt.grid()
+    plt.figure('Moment arm vs Theta')    
+    plt.title('Moment arm vs Theta')
+    plt.xlabel('Position [rad]')
+    plt.ylabel('Moment arm [m]')
+    plt.grid()
+    for i in range(0,len(a2a1)):
+        a2=a2a1[i]*a1
+        L1=(np.sqrt(a1**2+a2**2+2*a1*a2*np.sin(theta)))
+        h1=((a1*a2*np.cos(theta))/L1)
+        plt.figure('Muscle Length vs Theta')
+        plt.plot(theta,L1,label=("a2/a1=",str(a2a1[i])))
+        plt.legend()
+        plt.figure('Moment arm vs Theta')
+        plt.plot(theta,h1,label=("a2/a1=", str(a2a1[i])))
+        plt.legend()
+    
+#    plt.legend()
+
 
     # Define and Setup your pendulum model here
     # Check PendulumSystem.py for more details on Pendulum class
