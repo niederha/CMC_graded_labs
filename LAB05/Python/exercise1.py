@@ -199,13 +199,13 @@ def exercise1b(time_param):
                                                                                         ce_stretch_min, nb_pts,
                                                                                         time_param)
         lengths = [l_ce, l_slack, l_mtc]
-
+        force_legends.append("Passive force, stimulation ={}".format(stim))
+        force_legends.append("Active force, stimulation ={}".format(stim))
         # Plots
         for handle, length in zip(figure_handles, lengths):
             add_force_to_plot(handle, passive_force, length)
             add_force_to_plot(handle, active_force, length)
-            force_legends.append("Passive force, stimulation ={}".format(stim))
-            force_legends.append("Active force, stimulation ={}".format(stim))
+
     for handle in figure_handles:
         plt.figure(handle)
         plt.legend(force_legends)
