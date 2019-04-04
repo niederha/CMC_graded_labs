@@ -82,10 +82,9 @@ def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch,
     plt.grid()
 
 
-def add_force_to_plot(handle, force, l, legend):
+def add_force_to_plot(handle, force, l):
     plt.figure(handle)
     plt.plot(l, force)
-    plt.legend(legend)
     plt.grid()
 
 def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc):
@@ -141,6 +140,7 @@ def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5,
 
     return active_force, passive_force, total_force, l_ce, l_slack, l_mtc
 
+
 def exercise1a(time_param):
     """ Exercise 1a
     The goal of this exercise is to understand the relationship
@@ -183,6 +183,7 @@ def exercise1b(time_param):
     figure_titles = ["Stimulation variation CE stretch vs force", "Stimulation variation SLACK stretch vs force",
                      "Stimulation variation total stretch vs force"]
     figure_x_label = ["CE stretch [m]", "SLACK stretch [m]", "TOTAL stretch [m]"]
+    force_legends = []
     for handle, title, x_label in zip(figure_handles, figure_titles, figure_x_label):
         plt.figure(handle)
         plt.title(title)
@@ -201,9 +202,22 @@ def exercise1b(time_param):
 
         # Plots
         for handle, length in zip(figure_handles, lengths):
-            add_force_to_plot(handle, passive_force, length, " Passive force, stimulation ={}".format(stim))
-            add_force_to_plot(handle, active_force, length, " Active force, stimulation ={}".format(stim))
+            add_force_to_plot(handle, passive_force, length)
+            add_force_to_plot(handle, active_force, length)
+            force_legends.append("Passive force, stimulation ={}".format(stim))
+            force_legends.append("Active force, stimulation ={}".format(stim))
+    for handle in figure_handles:
+        plt.figure(handle)
+        plt.legend(force_legends)
     # endregion
+
+
+def exercise1c():
+
+    l_opt_1 = 0.5
+    l_opt_2 = 0.05
+
+
 
 def exercise1d():
     """ Exercise 1d
