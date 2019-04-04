@@ -80,8 +80,9 @@ def exercise3():
     ##### Neural Network #####
     # The network consists of four neurons
     N_params = NetworkParameters()  # Instantiate default network parameters
-    N_params.D = 2.  # To change a network parameter
     # Similarly to change w -> N_params.w = (4x4) array
+    
+    #----------------# Exercise 3a #----------------#
     N_params.D = 1.
     N_params.tau = np.array([0.02,0.02,0.1,0.1])
     N_params.b = np.array([3.0,3.0,-3.0,-3.0])
@@ -121,14 +122,19 @@ def exercise3():
     sim = SystemSimulation(sys)  # Instantiate Simulation object
 
     # Add external inputs to neural network
-    #ext_in = np.ones((len(time), 4))
-  
+
+    #ext_in = np.zeros((len(time), 4))
+    #ext_in[len(ext_in)/4:,:] = 0.25
+    #ext_in[2500:,:] = 1
+    #ext_in[len(ext_in)/4*3:,:] = 0.75
+        
     #sim.add_external_inputs_to_network(np.ones((len(time), 4)))
     #sim.add_external_inputs_to_network(ext_in)
 
     sim.initalize_system(x0, time)  # Initialize the system state
 
     sim.sys.pendulum_sys.parameters.PERTURBATION = True
+    
     # Integrate the system for the above initialized state and time
     sim.simulate()
 
@@ -162,7 +168,68 @@ def exercise3():
     plt.xlabel('Time [s]')
     plt.ylabel('Activation')
     plt.grid()
+    plt.legend()
+    
+    #----------------# Exercise 3a finished #----------------#
+    
+    #----------------# Exercise 3b #----------------#
+    
+        ##### System Simulation #####
+    # For more details on System Simulation check SystemSimulation.py
+    # SystemSimulation is used to initialize the system and integrate
+    # over time
 
+    sim = SystemSimulation(sys)  # Instantiate Simulation object
+
+    # Add external inputs to neural network
+
+    ext_in = np.zeros((len(time), 4))
+    #ext_in[len(ext_in)/4:,:] = 0.25
+    ext_in[2500:,:] = 1
+    #ext_in[len(ext_in)/4*3:,:] = 0.75
+        
+    #sim.add_external_inputs_to_network(np.ones((len(time), 4)))
+    sim.add_external_inputs_to_network(ext_in)
+
+    sim.initalize_system(x0, time)  # Initialize the system state
+
+    sim.sys.pendulum_sys.parameters.PERTURBATION = False
+    
+    # Integrate the system for the above initialized state and time
+    sim.simulate()
+
+    # Obtain the states of the system after integration
+    # res is np.array [time, states]
+    # states vector is in the same order as x0
+    res = sim.results()
+
+    # Obtain the states of the system after integration
+    # res is np.array [time, states]
+    # states vector is in the same order as x0
+    res = sim.results()
+
+    # In order to obtain internal states of the muscle
+    # you can access the results attribute in the muscle class
+    muscle1_results = sim.sys.muscle_sys.Muscle1.results
+    muscle2_results = sim.sys.muscle_sys.Muscle2.results
+
+    # Plotting the results
+    plt.figure('3b_Pendulum_Phase')
+    plt.title('Pendulum Phase')
+    plt.plot(res[:, 1], res[:, 2])
+    plt.xlabel('Position [rad]')
+    plt.ylabel('Velocity [rad.s]')
+    plt.grid()
+    
+    plt.figure('3b_Output_Neuron')
+    plt.title('Network output')
+    plt.plot(res[:, 0], res[:, 3], label='Activation M1')
+    plt.plot(res[:, 0], res[:, 5], label='Activation M2')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Activation')
+    plt.grid()
+    plt.legend()
+    
     if DEFAULT["save_figures"] is False:
         plt.show()
     else:
