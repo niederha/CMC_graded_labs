@@ -52,12 +52,12 @@ def exercise2():
     a1= 1
     a2a1=np.linspace(0.5,2,num=4)
 
-    plt.figure('Muscle Length vs Theta')    
+    plt.figure('2a_Muscle_Length_vs_Theta')    
     plt.title('Muscle Length vs Theta')
     plt.xlabel('Position [rad]')
     plt.ylabel('Muscle length [m]')
     plt.grid()
-    plt.figure('Moment arm vs Theta')    
+    plt.figure('2a_Moment_arm_vs_Theta')    
     plt.title('Moment arm vs Theta')
     plt.xlabel('Position [rad]')
     plt.ylabel('Moment arm [m]')
@@ -68,15 +68,15 @@ def exercise2():
         L1=(np.sqrt(a1**2+a2**2+2*a1*a2*np.sin(theta)))
         h1=((a1*a2*np.cos(theta))/L1)
 
-        plt.figure('Muscle Length vs Theta')
+        plt.figure('2a_Muscle_Length_vs_Theta')
         plt.plot(theta,L1,label=('a2/a1 = %.1f' %(a2a1[i])))
 
-        plt.figure('Moment arm vs Theta')
+        plt.figure('2a_Moment_arm_vs_Theta')
         plt.plot(theta,h1,label=('a2/a1= %.1f' %(a2a1[i])))
         
-    plt.figure('Muscle Length vs Theta')
+    plt.figure('2a_Muscle_Length_vs_Theta')
     plt.legend()
-    plt.figure('Moment arm vs Theta')
+    plt.figure('2a_Moment_arm_vs_Theta')
     plt.legend()
 
     # Define and Setup your pendulum model here
