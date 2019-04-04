@@ -91,7 +91,7 @@ def exercise2():
     sys.add_muscle_system(muscles)  # Add the muscle model to the system
 
     ##### Time #####
-    t_max = 2.5  # Maximum simulation time
+    t_max = 5  # Maximum simulation time
     time = np.arange(0., t_max, 0.001)  # Time vector
 
     ##### Model Initial Conditions #####
@@ -113,14 +113,108 @@ def exercise2():
     # Here you can define your muscle activation vectors
     # that are time dependent
 
-    act1 = np.ones((len(time), 1)) * 1.
-    act2 = np.ones((len(time), 1)) * 0.05
+    #act1 = np.ones((len(time), 1)) * 1.
+    #act2 = np.ones((len(time), 1)) * 0.05
+    w = np.linspace(2,20,4)
 
-    activations = np.hstack((act1, act2))
 
+    maxAmplitude = []
+    frequency = []
+    plt.figure('2c_LimitCycle')
+    plt.title('Pendulum Phase')
+    
+    plt.figure('2c_Amplitude')
+    plt.title('Amplitude vs. Frequency')
+    
+    for i in range(0,len(w)):
+        plt.figure('2c_LimitCycle')
+        print('Running simulation %d out of %d'%(i+1,len(w)))
+        sinAct = np.sin(w[i]*time).reshape(len(time),1)
+        sinFlex = sinAct.copy()
+        sinFlex[sinAct<0] = 0 
+        sinExt = sinAct.copy()
+        sinExt[sinAct>0] = 0
+        sinExt = abs(sinExt)
+        
+        sinAct1 = np.ones((len(time),1))
+        sinAct2 = np.ones((len(time),1))
+        sinAct1 = sinFlex
+        sinAct2 = sinExt
+        #sinAct1 = np.sin(w2*time).reshape(len(time),1)
+        #sinAct2 = np.sin(w2*time).reshape(len(time),1)
+    
+        #activations = np.hstack((act1, act2))
+    
+        sinActivations = np.hstack((sinAct1,sinAct2))
+        # Method to add the muscle activations to the simulation
+    
+        sim.add_muscle_activations(sinActivations)
+    
+        # Simulate the system for given time
+    
+        sim.initalize_system(x0, time)  # Initialize the system state
+    
+        #: If you would like to perturb the pedulum model then you could do
+        # so by
+        sim.sys.pendulum_sys.parameters.PERTURBATION = False
+        # The above line sets the state of the pendulum model to zeros between
+        # time interval 1.2 < t < 1.25. You can change this and the type of
+        # perturbation in
+        # pendulum_system.py::pendulum_system function
+    
+        # Integrate the system for the above initialized state and time
+        sim.simulate()
+    
+        # Obtain the states of the system after integration
+        # res is np.array [time, states]
+        # states vector is in the same order as x0
+        res = sim.results()
+    
+        # In order to obtain internal states of the muscle
+        # you can access the results attribute in the muscle class
+        muscle1_results = sim.sys.muscle_sys.Muscle1.results
+        muscle2_results = sim.sys.muscle_sys.Muscle2.results
+    
+        # Plotting the results
+        
+        plt.plot(res[:, 1], res[:, 2], label='Act. $sin(%.1f t)$'%(w[i]))
+        
+        plt.figure('2c_Amplitude')
+        plt.plot(time,res[:, 1], label='Frequency = %.1f'%(w[i]))
+        
+    plt.figure('2c_LimitCycle')
+    plt.xlabel('Position [rad]')
+    plt.ylabel('Velocity [rad/s]')
+    plt.grid()
+    plt.legend()
+    
+    plt.figure('2c_Amplitude')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Amplitude [rad]')
+    plt.grid()
+    plt.legend()
+    
+    w = 3
+    sinAct = np.sin(w*time).reshape(len(time),1)
+    sinFlex = sinAct.copy()
+    sinFlex[sinAct<0] = 0 
+    sinExt = sinAct.copy()
+    sinExt[sinAct>0] = 0
+    sinExt = abs(sinExt)
+    
+    sinAct1 = np.ones((len(time),1))
+    sinAct2 = np.ones((len(time),1))
+    sinAct1 = sinFlex
+    sinAct2 = sinExt
+    #sinAct1 = np.sin(w2*time).reshape(len(time),1)
+    #sinAct2 = np.sin(w2*time).reshape(len(time),1)
+
+    #activations = np.hstack((act1, act2))
+
+    sinActivations = np.hstack((sinAct1,sinAct2))
     # Method to add the muscle activations to the simulation
 
-    sim.add_muscle_activations(activations)
+    sim.add_muscle_activations(sinActivations)
 
     # Simulate the system for given time
 
@@ -148,12 +242,22 @@ def exercise2():
     muscle2_results = sim.sys.muscle_sys.Muscle2.results
 
     # Plotting the results
-    plt.figure('Pendulum')
+    plt.figure('2b_LimitCycle')
     plt.title('Pendulum Phase')
-    plt.plot(res[:, 1], res[:, 2])
+    plt.plot(res[:, 1], res[:, 2], label='Act. $sin(3t)$, Pert. ($t=3.2,\\theta = 1, \dot{\\theta} = -0.5$)')
     plt.xlabel('Position [rad]')
-    plt.ylabel('Velocity [rad.s]')
+    plt.ylabel('Velocity [rad/s]')
     plt.grid()
+    plt.legend()
+    
+    plt.figure('2b_ActivationFunction')
+    plt.title('Activation Function')
+    plt.plot(time, sinAct1, label='Flexor')
+    plt.plot(time, sinAct2, label='Extensor')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Activation')
+    plt.grid()
+    plt.legend()
 
     # To animate the model, use the SystemAnimation class
     # Pass the res(states) and systems you wish to animate
