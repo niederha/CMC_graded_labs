@@ -332,7 +332,7 @@ def exercise1():
 
     # exercise1a(time_param)
     # exercise1b(time_param)
-    exercise1c(time_param)
+    # exercise1c(time_param)
     # exercise1d()
 
     print(DEFAULT["save_figures"])
