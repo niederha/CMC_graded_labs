@@ -62,19 +62,22 @@ def exercise2():
     plt.xlabel('Position [rad]')
     plt.ylabel('Moment arm [m]')
     plt.grid()
+
     for i in range(0,len(a2a1)):
         a2=a2a1[i]*a1
         L1=(np.sqrt(a1**2+a2**2+2*a1*a2*np.sin(theta)))
         h1=((a1*a2*np.cos(theta))/L1)
-        plt.figure('Muscle Length vs Theta')
-        plt.plot(theta,L1,label=("a2/a1=",str(a2a1[i])))
-        plt.legend()
-        plt.figure('Moment arm vs Theta')
-        plt.plot(theta,h1,label=("a2/a1=", str(a2a1[i])))
-        plt.legend()
-    
-#    plt.legend()
 
+        plt.figure('Muscle Length vs Theta')
+        plt.plot(theta,L1,label=('a2/a1 = %.1f' %(a2a1[i])))
+
+        plt.figure('Moment arm vs Theta')
+        plt.plot(theta,h1,label=('a2/a1= %.1f' %(a2a1[i])))
+        
+    plt.figure('Muscle Length vs Theta')
+    plt.legend()
+    plt.figure('Moment arm vs Theta')
+    plt.legend()
 
     # Define and Setup your pendulum model here
     # Check PendulumSystem.py for more details on Pendulum class
