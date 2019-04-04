@@ -1,3 +1,4 @@
 # Don't track content of these folders
 Lab*/Python/__pycache__/
 Lab*/Python/cmcpack/
+Lab*/Python/.idea/
