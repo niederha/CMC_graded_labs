@@ -192,8 +192,8 @@ def exercise2():
         for fig in figures:
             plt.figure(fig)
             save_figure(fig)
-            plt.close(fig)
-
+            #plt.close(fig)
+        plt.show
 
 if __name__ == '__main__':
     from cmcpack import parse_args
