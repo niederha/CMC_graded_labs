@@ -87,24 +87,39 @@ def add_force_to_plot(handle, force, l):
     plt.plot(l, force)
     plt.grid()
 
-def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc):
 
-    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
-                              'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
-                              handle="1_a_lce_vs_str")
-    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
-                              'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
-                              handle="1_a_lsl_vs_str")
-    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
-                              'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
-                              handle="1_a_lmtc_vs_str")
+def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc, handle=None):
+
+    if handle is None:
+        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
+                                  'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
+                                  handle="1_a_lce_vs_str")
+        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
+                                  'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
+                                  handle="1_a_lsl_vs_str")
+        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
+                                  'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
+                                  handle="1_a_lmtc_vs_str")
+    # TODO: Have this redone in a more logical way
+    else:
+        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
+                                  'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
+                                  handle=handle[0])
+        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
+                                  'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
+                                  handle=handle[1])
+        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
+                                  'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
+                                  handle=handle[2])
 
 
 def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
-                   time_param=TimeParameters()):
+                   time_param=TimeParameters(), l_opt=None):
 
     # System definition
     parameters = MuscleParameters()
+    if l_opt is not None:
+        parameters.l_opt = l_opt
     pylog.info(parameters.showParameters())
     muscle = Muscle(parameters)
     sys = IsometricMuscleSystem()
@@ -212,11 +227,28 @@ def exercise1b(time_param):
     # endregion
 
 
-def exercise1c():
+def exercise1c(time_param):
 
     l_opt_1 = 0.5
     l_opt_2 = 0.05
+    stim = 1
+    ce_stretch_max = 1.5
+    ce_stretch_min = 0.5
+    nb_pts = 1000
+    handles_long = ["1_c_lce_iso_long", "1_c_lsl_iso_long", "1_c_lmtc_long"]
+    handles_small = ["1_c_lce_iso_small", "1_c_lsl_iso_small", "1_c_lmtc_small"]
+    active_force_1, passive_force_1, total_force_1, l_ce_1, l_slack_1, l_mtc_1 = iso_experiment(stim,
+                                                                                                ce_stretch_max,
+                                                                                                ce_stretch_min, nb_pts,
+                                                                                                time_param, l_opt_1)
+    active_force_2, passive_force_2, total_force_2, l_ce_2, l_slack_2, l_mtc_2 = iso_experiment(stim,
+                                                                                                ce_stretch_max,
+                                                                                                ce_stretch_min, nb_pts,
+                                                                                                time_param, l_opt_2)
 
+    plot_isometric_data(active_force_1, passive_force_1, total_force_1, l_ce_1, l_slack_1, l_mtc_1, handle=handles_long)
+    plot_isometric_data(active_force_2, passive_force_2, total_force_2, l_ce_2, l_slack_2, l_mtc_2,
+                        handle=handles_small)
 
 
 def exercise1d():
@@ -299,7 +331,8 @@ def exercise1():
     time_param = TimeParameters(0.0, 0.2, 0.001)
 
     # exercise1a(time_param)
-    exercise1b(time_param)
+    # exercise1b(time_param)
+    exercise1c(time_param)
     # exercise1d()
 
     print(DEFAULT["save_figures"])
