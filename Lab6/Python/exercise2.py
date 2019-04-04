@@ -46,6 +46,28 @@ def exercise2():
     -------
         None
     """
+    # 2a
+#    theta = np.linspace(-np.pi, np.pi,num=20)
+#    a1= 1
+#    a2a1=np.linspace(0.1,2,num=5)
+#
+#    plt.figure('Muscle Length vs Theta')    
+#    plt.title('Pendulum Phase')
+#    plt.plot(theta,L1)
+#    plt.xlabel('Position [rad]')
+#    plt.ylabel('Velocity [rad.s]')
+#    plt.grid()
+#    for i in range(0,len(a2a1)):
+#        a2=a2a1[i]*a1
+#        L1.append(np.sqrt(a1**2+a2**2+2*a1*a2*np.sin(theta)))
+#        h1.append((a1*a2*cos(theta))/L1[-1])
+#    plt.figure('Muscle Length vs Theta')    
+#    plt.title('Pendulum Phase')
+#    plt.plot(theta,L1)
+#    plt.xlabel('Position [rad]')
+#    plt.ylabel('Velocity [rad.s]')
+#    plt.grid()
+
 
     # Define and Setup your pendulum model here
     # Check PendulumSystem.py for more details on Pendulum class
