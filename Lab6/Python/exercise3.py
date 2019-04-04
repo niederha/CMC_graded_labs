@@ -82,7 +82,10 @@ def exercise3():
     N_params = NetworkParameters()  # Instantiate default network parameters
     N_params.D = 2.  # To change a network parameter
     # Similarly to change w -> N_params.w = (4x4) array
-
+    N_params.D = 1.
+    N_params.tau = np.array([0.02,0.02,0.1,0.1])
+    N_params.b = np.array([3.0,3.0,-3.0,-3.0])
+    N_params.w = np.array([[0,-5,-5,0],[-5,0,0,-5],[5,-5,0,0],[-5,5,0,0]])
     # Create a new neural network with above parameters
     neural_network = NeuralSystem(N_params)
     pylog.info('Neural system initialized \n {}'.format(
@@ -97,7 +100,7 @@ def exercise3():
     sys.add_neural_system(neural_network)
 
     ##### Time #####
-    t_max = 2.5  # Maximum simulation time
+    t_max = 5  # Maximum simulation time
     time = np.arange(0., t_max, 0.001)  # Time vector
 
     ##### Model Initial Conditions #####
@@ -118,12 +121,14 @@ def exercise3():
     sim = SystemSimulation(sys)  # Instantiate Simulation object
 
     # Add external inputs to neural network
-
-    # sim.add_external_inputs_to_network(np.ones((len(time), 4)))
-    # sim.add_external_inputs_to_network(ext_in)
+    #ext_in = np.ones((len(time), 4))
+  
+    #sim.add_external_inputs_to_network(np.ones((len(time), 4)))
+    #sim.add_external_inputs_to_network(ext_in)
 
     sim.initalize_system(x0, time)  # Initialize the system state
 
+    sim.sys.pendulum_sys.parameters.PERTURBATION = True
     # Integrate the system for the above initialized state and time
     sim.simulate()
 
@@ -143,11 +148,19 @@ def exercise3():
     muscle2_results = sim.sys.muscle_sys.Muscle2.results
 
     # Plotting the results
-    plt.figure('Pendulum')
+    plt.figure('3a_Pendulum_Phase')
     plt.title('Pendulum Phase')
-    plt.plot(res[:, 0], res[:, :2])
+    plt.plot(res[:, 1], res[:, 2])
     plt.xlabel('Position [rad]')
     plt.ylabel('Velocity [rad.s]')
+    plt.grid()
+    
+    plt.figure('3a_Output_Neuron')
+    plt.title('Network output')
+    plt.plot(res[:, 0], res[:, 3], label='Activation M1')
+    plt.plot(res[:, 0], res[:, 5], label='Activation M2')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Activation')
     plt.grid()
 
     if DEFAULT["save_figures"] is False:
@@ -158,8 +171,8 @@ def exercise3():
         for fig in figures:
             plt.figure(fig)
             save_figure(fig)
-            plt.close(fig)
-
+            #plt.close(fig)
+        plt.show()
     # To animate the model, use the SystemAnimation class
     # Pass the res(states) and systems you wish to animate
     simulation = SystemAnimation(
