@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 import cmc_pylog as pylog
 from muscle import Muscle
@@ -35,28 +36,22 @@ class TimeParameters:
         self.times = np.arange(self.t_start, self.t_stop, self.step)
 
 
-def find_ce_stretch_iso(ce_stretch, time_param, stimulation=1, error_max=0.01):
+def find_ce_stretch_iso(muscle_sys, ce_stretch, time_param, stimulation=1, error_max=0.01):
     """Finds the total relative stretch to apply to obtain ce_stretch in isometric mode"""
     stretch = error_max
 
-    # Muscle definition
-    parameters = MuscleParameters()
-    muscle = Muscle(parameters)
-    sys = IsometricMuscleSystem()
-    sys.add_muscle(muscle)
-
     # Simulation parameters
-    x0 = [0.0, sys.muscle.L_OPT]
+    x0 = [0.0, muscle_sys.muscle.L_OPT]
 
     while True:
-        result = sys.integrate(x0=x0,
-                               time=time_param.times,
-                               time_step=time_param.step,
-                               stimulation=stimulation,
-                               muscle_length=stretch * (sys.muscle.L_OPT+sys.muscle.L_SLACK))
-        if result.l_ce[-1]/sys.muscle.L_OPT > ce_stretch:
-            pylog.info("Reaches l_ce stretch " + str(result.l_ce[-1]/sys.muscle.L_OPT) + " for total stretch of:" +
-                       str(stretch))
+        result = muscle_sys.integrate(x0=x0,
+                                      time=time_param.times,
+                                      time_step=time_param.step,
+                                      stimulation=stimulation,
+                                      muscle_length=stretch * (muscle_sys.muscle.L_OPT+muscle_sys.muscle.L_SLACK))
+        if result.l_ce[-1]/muscle_sys.muscle.L_OPT > ce_stretch:
+            pylog.info("Reaches l_ce stretch " + str(result.l_ce[-1]/muscle_sys.muscle.L_OPT) + " for total stretch of:"
+                       + str(stretch))
             break
         else:
             stretch += error_max
@@ -66,7 +61,7 @@ def find_ce_stretch_iso(ce_stretch, time_param, stimulation=1, error_max=0.01):
 
 def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch, title, x_label, handle=None):
 
-    force_labels = ['Active', 'Passive', 'Total']
+    force_labels = ['Active force, stimulation = 1.', 'Passive, stimulation = 1.', 'Total, stimulation = 1.']
     if handle is None:
         handle = title
 
@@ -90,30 +85,40 @@ def add_force_to_plot(handle, force, l):
 
 def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc, handle=None):
 
-    if handle is None:
-        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
-                                  'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
-                                  handle="1_a_lce_vs_str")
-        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
-                                  'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
-                                  handle="1_a_lsl_vs_str")
-        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
-                                  'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
-                                  handle="1_a_lmtc_vs_str")
-    # TODO: Have this redone in a more logical way
-    else:
-        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
-                                  'Isometric muscle experiment: stretch of CE vs force', 'CE stretch [m]',
-                                  handle=handle[0])
-        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
-                                  'Isometric muscle experiment: stretch of SLACK vs force', 'SLACK stretch [m]',
-                                  handle=handle[1])
-        plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
-                                  'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
-                                  handle=handle[2])
+    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
+                              'Isometric muscle experiment: length of contractile element vs force',
+                              'Length of the contractile element stretch [m]',
+                              handle=handle[0])
+    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_slack,
+                              'Isometric muscle experiment: length of SLACK vs force', 'SLACK stretch [m]',
+                              handle=handle[1])
+    plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
+                              'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
+                              handle=handle[2])
 
 
-def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
+def equalize_axis(handles):
+    x_min = math.inf
+    x_max = -math.inf
+    y_min = math.inf
+    y_max = -math.inf
+
+    for handle in handles:
+        plt.figure(handle)
+        x_bot, x_top = plt.xlim()
+        y_bot, y_top = plt.ylim()
+        x_min = min(x_min, x_bot)
+        x_max = max(x_max, x_top)
+        y_min = min(y_min, y_bot)
+        y_max = max(y_max, y_top)
+
+    for handle in handles:
+        plt.figure(handle)
+        plt.xlim(x_min, x_max)
+        plt.ylim(y_min, y_max)
+
+
+def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
                    time_param=TimeParameters(), l_opt=None):
 
     # System definition
@@ -126,8 +131,8 @@ def iso_experiment(muscle_stimulation=1, ce_stretch_max=1.5, ce_stretch_min=0.5,
     sys.add_muscle(muscle)
 
     # Experiment parameters
-    muscle_stretch_max = find_ce_stretch_iso(ce_stretch_max, time_param)
-    muscle_stretch_min = find_ce_stretch_iso(ce_stretch_min, time_param)
+    muscle_stretch_max = find_ce_stretch_iso(sys, ce_stretch_max, time_param)
+    muscle_stretch_min = find_ce_stretch_iso(sys, ce_stretch_min, time_param)
     stretches = np.arange(muscle_stretch_min, muscle_stretch_max, muscle_stretch_max / nb_pts)
     x0 = [0.0, sys.muscle.L_OPT + sys.muscle.L_SLACK]
 
@@ -171,12 +176,12 @@ def exercise1a(time_param):
     ce_stretch_max = 1.5
     ce_stretch_min = 0.5
     nb_pts = 1000
-
+    handles = ["1_a_lce_vs_str", "1_a_lsl_vs_str", "1_a_lmtc_vs_str"]
     # Experiment
     active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(muscle_stimulation, ce_stretch_max,
-                                                                                    ce_stretch_min, nb_pts, time_param)
+                                                                                    ce_stretch_min, nb_pts, time_param,)
     # Plotting
-    plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc)
+    plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc, handle=handles)
     # endregion
 
 
@@ -230,10 +235,10 @@ def exercise1b(time_param):
 def exercise1c(time_param):
 
     l_opt_1 = 0.5
-    l_opt_2 = 0.05
-    stim = 1
-    ce_stretch_max = 1.5
-    ce_stretch_min = 0.5
+    l_opt_2 = 0.25
+    stim = 1.
+    ce_stretch_max = 2
+    ce_stretch_min = 0.1
     nb_pts = 1000
     handles_long = ["1_c_lce_iso_long", "1_c_lsl_iso_long", "1_c_lmtc_long"]
     handles_small = ["1_c_lce_iso_small", "1_c_lsl_iso_small", "1_c_lmtc_small"]
@@ -249,6 +254,9 @@ def exercise1c(time_param):
     plot_isometric_data(active_force_1, passive_force_1, total_force_1, l_ce_1, l_slack_1, l_mtc_1, handle=handles_long)
     plot_isometric_data(active_force_2, passive_force_2, total_force_2, l_ce_2, l_slack_2, l_mtc_2,
                         handle=handles_small)
+
+    for graph_couple in zip(handles_long, handles_small):
+        equalize_axis(graph_couple)
 
 
 def exercise1d():
@@ -330,7 +338,7 @@ def exercise1():
     pylog.info("Start exercise 1")
     time_param = TimeParameters(0.0, 0.2, 0.001)
 
-    # exercise1a(time_param)
+    exercise1a(time_param)
     # exercise1b(time_param)
     # exercise1c(time_param)
     # exercise1d()
