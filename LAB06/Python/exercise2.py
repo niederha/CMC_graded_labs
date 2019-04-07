@@ -33,7 +33,7 @@ plt.rc('xtick', labelsize=14.0)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=14.0)    # fontsize of the tick labels
 
 
-class timeParamters:
+class TimeParameters:
 
     def __init__(self, t_init=0, t_final=2.5, t_step=0.001):
         self.t_init = t_init
@@ -55,7 +55,7 @@ def exercise2():
         None
     """
 
-    time_param = timeParamters()
+    time_param = TimeParameters()
 
     # region system initialisation
     # region pendulum_definition
@@ -116,7 +116,7 @@ def exercise2():
     sim.initalize_system(x0, time_param.times)  # Initialize the system state
     sim.sys.pendulum_sys.parameters.PERTURBATION = True
     sim.simulate()
-    res = sim.results()
+    res = sim.results() # [time, states]
     muscle1_results = sim.sys.muscle_sys.Muscle1.results
     muscle2_results = sim.sys.muscle_sys.Muscle2.results
     # endregion
@@ -133,7 +133,7 @@ def exercise2():
     if DEFAULT["save_figures"] is False:
         simulation.animate()
     # endregion
-    
+
     if not DEFAULT["save_figures"]:
         plt.show()
     else:
