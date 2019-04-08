@@ -38,9 +38,10 @@ class TimeParameters:
 
 def find_ce_stretch_iso(muscle_sys, ce_stretch, time_param, stimulation=1, error_max=0.01):
     """Finds the total relative stretch to apply to obtain ce_stretch in isometric mode"""
-    stretch = error_max
-
-    # Simulation parameters
+    stretch = 0
+    # The stretch is constant for over compression (i.e[0,sth]) hence we wanna monitor this to avoid being
+    # in a regime where the computations are biased.
+    minimal_ce_stretch = None
     x0 = [0.0, muscle_sys.muscle.L_OPT]
 
     while True:
@@ -48,13 +49,16 @@ def find_ce_stretch_iso(muscle_sys, ce_stretch, time_param, stimulation=1, error
                                       time=time_param.times,
                                       time_step=time_param.step,
                                       stimulation=stimulation,
-                                      muscle_length=stretch * (muscle_sys.muscle.L_OPT+muscle_sys.muscle.L_SLACK))
-        if result.l_ce[-1]/muscle_sys.muscle.L_OPT > ce_stretch:
-            pylog.info("Reaches l_ce stretch " + str(result.l_ce[-1]/muscle_sys.muscle.L_OPT) + " for total stretch of:"
-                       + str(stretch))
-            break
+                                      muscle_length=stretch)
+        if minimal_ce_stretch is None:
+            minimal_ce_stretch = result.l_ce[-1]  # Monitoring the what the ce_stretch is in over compression
         else:
-            stretch += error_max
+            if result.l_ce[-1] > ce_stretch * x0[1] and result.l_ce[-1] > minimal_ce_stretch:
+                pylog.info("Reaches l_ce stretch " + str(result.l_ce[-1]/muscle_sys.muscle.L_OPT) +
+                           " for total stretch of:" + str(stretch))
+                break
+            else:
+                stretch += error_max
 
     return stretch
 
@@ -134,7 +138,7 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
     muscle_stretch_max = find_ce_stretch_iso(sys, ce_stretch_max, time_param)
     muscle_stretch_min = find_ce_stretch_iso(sys, ce_stretch_min, time_param)
     stretches = np.arange(muscle_stretch_min, muscle_stretch_max, muscle_stretch_max / nb_pts)
-    x0 = [0.0, sys.muscle.L_OPT + sys.muscle.L_SLACK]
+    x0 = [0.0, sys.muscle.L_OPT]
 
     # Containers
     active_force = []
@@ -150,7 +154,7 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
                                time=time_param.times,
                                time_step=time_param.step,
                                stimulation=muscle_stimulation,
-                               muscle_length=stretch * (x0[1]))
+                               muscle_length=stretch)
         active_force.append(result.active_force[-1])
         passive_force.append(result.passive_force[-1])
         total_force.append(result.tendon_force[-1])
@@ -343,12 +347,10 @@ def exercise1():
     # exercise1c(time_param)
     # exercise1d()
 
-    print(DEFAULT["save_figures"])
     if DEFAULT["save_figures"] is False:
         plt.show()
     else:
         figures = plt.get_figlabels()
-        print(figures)
         pylog.debug("Saving figures:\n{}".format(figures))
         for fig in figures:
             plt.figure(fig)

@@ -90,7 +90,7 @@ class IsometricMuscleSystem(object):
 
         #: Integration
 
-        #: Instatiate the muscle results container
+        #: Instantiate the muscle results container
         self.muscle.instantiate_result_from_state(time)
 
         #: Run step integration
