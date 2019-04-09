@@ -45,6 +45,7 @@ def find_ce_stretch_iso(muscle_sys, ce_stretch, time_param, stimulation=1, error
     minimal_ce_stretch = None
     x0 = [0.0, muscle_sys.muscle.L_OPT]
 
+    # Running experiments until we find a stretch that matches the conditions on CE
     while True:
         result = muscle_sys.integrate(x0=x0,
                                       time=time_param.times,
@@ -71,8 +72,9 @@ def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch,
     Parameters:
         - title: title of the graph
         - x_label: x_label of the graph
-        - handle: hadle of the graph. If None title will be used as handle
+        - handle: handle of the graph. If None title will be used as handle
     """
+
     force_labels = ['Active force, stimulation = {}'.format(stimulation),
                     'Passive, stimulation = {}'.format(stimulation),
                     'Total, stimulation = {}'.format(stimulation)]
@@ -92,6 +94,7 @@ def plot_all_force_vs_stretch(active_force, passive_force, total_force, stretch,
 
 
 def add_force_to_plot(handle, force, l):
+    """Add a new force (force)  on a length (l) to a plot (handle)"""
     plt.figure(handle)
     plt.plot(l, force)
     plt.grid()
@@ -99,7 +102,8 @@ def add_force_to_plot(handle, force, l):
 
 def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc, handle, l_opt=None):
     """
-    Plots three graphs (function of l_ce, l_mtc and l_ce)
+    Plots the three forces (active, passive and total) for each three graphs (function of l_ce, l_mtc and l_ce).
+    Adds a vertical line @l_opt on the l_ce graph.
     """
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_ce,
                               'Isometric muscle experiment: length of contractile element vs force',
@@ -111,11 +115,12 @@ def plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack,
     plot_all_force_vs_stretch(active_force, passive_force, total_force, l_mtc,
                               'Isometric muscle experiment: stretch of TOTAL MUSCLE vs force', 'TOTAL stretch [m]',
                               handle=handle[2])
-    add_l_opt_marker(handle[0], l_opt)
+
+    add_l_opt_marker(handle[0], l_opt)  # Add the l_opt marker on the l_ce graph
 
 
 def add_l_opt_marker(handle, l_opt=None):
-
+    """Add a vertical labeled line on the graph  @l_opt (uses the default l_opt if l_opt is None)"""
     if l_opt is None:
         muscle_parameters = MuscleParameters()
         l_opt = muscle_parameters.l_opt
@@ -125,11 +130,15 @@ def add_l_opt_marker(handle, l_opt=None):
 
 
 def get_common_axis_limits(handles):
+    """ Finds the axis limits to use in order to merge all graph (specified in the handels lists) in a single graph
+    without cutting any part of any curves. """
+
     x_min = math.inf
     x_max = -math.inf
     y_min = math.inf
     y_max = -math.inf
 
+    # Test limits for all axis on all graphs
     for handle in handles:
         plt.figure(handle)
         x_bot, x_top = plt.xlim()
@@ -143,6 +152,17 @@ def get_common_axis_limits(handles):
 
 def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
                    time_param=TimeParameters(), l_opt=None):
+    """ Runs a experiments in isometric mode for multiple stretches, returns the results
+    Parameters:
+        - muscle_stimulation: applied stimulation.
+        - ce_stretch_max: the maximal stretch to apply to the contractile element.
+        - ce_stretch_min: the minimal stretch to apply to the contractile element.
+        - nb_pts: the number of times the experiment should be ran between the min and max stretch.
+         (i.e number of points in the results)
+        - time_param: A TimeParameters object to pass the intended time parameters for every experiment.
+        - l_opt: The optimal length of the contractile element. If None the default one is taken
+    Returns every parameters for the experiments.
+    """
 
     # System definition
     parameters = MuscleParameters()
@@ -185,30 +205,26 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
 
 
 def exercise1a(time_param):
-    """ Exercise 1a
-    The goal of this exercise is to understand the relationship
-    between muscle length and tension.
-    Here you will re-create the isometric muscle contraction experiment.
-    To do so, you will have to keep the muscle at a constant length and
-    observe the force while stimulating the muscle at a constant activation."""
-
-    # region part_a
+    """ Runs and plot the length-force relationship for a muscle in isometric conditions."""
     pylog.info("Part a")
+
     # Parameters
     muscle_stimulation = 1.
     ce_stretch_max = 1.5
     ce_stretch_min = 0.5
     nb_pts = 1000
     handles = ["1_a_lce_vs_str", "1_a_lsl_vs_str", "1_a_lmtc_vs_str"]
+
     # Experiment
     active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(muscle_stimulation, ce_stretch_max,
                                                                                     ce_stretch_min, nb_pts, time_param,)
     # Plotting
     plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc, handle=handles)
-    # endregion
 
 
 def exercise1b(time_param):
+    """Runs and plot the length-force relationship for a muscle in isometric conditions and various activations
+    amplitudes."""
     pylog.info("part b")
 
     # region Parameters
@@ -236,8 +252,9 @@ def exercise1b(time_param):
         plt.grid()
     # endregion
 
-    # region Experiences
+    # region Experiences (expect it to take some time)
     for stim in stimulations:
+        # Running the integration
         active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(stim,
                                                                                         ce_stretch_max,
                                                                                         ce_stretch_min, nb_pts,
@@ -249,7 +266,7 @@ def exercise1b(time_param):
         for handle, length in zip(figure_handles, lengths):
             add_force_to_plot(handle, active_force, length)
 
-    # Adding passive force only once
+    # Adding passive force only once (it isn't influenced by stimulation)
     for handle, length in zip(figure_handles, lengths):
         add_force_to_plot(handle, passive_force, length)
     force_legends.append("Passive force (not stimulation dependent)")
@@ -264,22 +281,32 @@ def exercise1b(time_param):
 
 
 def exercise1c(time_param):
+    """ Plots the force-length relationship for two muscle with different l_ce in isometric conditions."""
     pylog.info("part C")
+
+    # region Parameters
     l_opt_long = 0.5
     l_opt_small = 0.25
     stim = 1.
     ce_stretch_max = 1.5
     ce_stretch_min = 0.5
     nb_pts = 1000
+    # endregion
+
+    # region Experiments
+    active_force_long, passive_force_long, total_force_long, l_ce_long, l_slack_long, l_mtc_long = \
+        iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_long)
+    active_force_small, passive_force_small, total_force_small, l_ce_small, l_slack_small, l_mtc_small = \
+        iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_small)
+    # endregion
+
+    # region Plots
+    # Plots parameters
     handles_long = ["1_c_lce_iso_long", "1_c_lsl_iso_long", "1_c_lmtc_long"]
     handles_small = ["1_c_lce_iso_small", "1_c_lsl_iso_small", "1_c_lmtc_small"]
     handles_merged = ["1_c_lce_iso_merged", "1_c_lsl_iso_merged", "1_c_lmtc_merged"]
     merged_legends = ["Active force, l_opt=0.5", "Passive force, l_opt=0.5", "Total force, l_opt=0.5", "_nolegend_",
                       "Active force, l_opt=0.25", "Passive force, l_opt=0.25", "Total force, l_opt=0.25"]
-    active_force_long, passive_force_long, total_force_long, l_ce_long, l_slack_long, l_mtc_long = \
-        iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_long)
-    active_force_small, passive_force_small, total_force_small, l_ce_small, l_slack_small, l_mtc_small = \
-        iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_small)
 
     # Separated plots
     plot_isometric_data(active_force_long, passive_force_long, total_force_long, l_ce_long, l_slack_long, l_mtc_long,
@@ -293,6 +320,7 @@ def exercise1c(time_param):
     plot_isometric_data(active_force_small, passive_force_small, total_force_small, l_ce_small, l_slack_small,
                         l_mtc_small, handle=handles_merged, l_opt=l_opt_small)
 
+    # Axis equalisation for merged plots
     for handle_long, handle_small, handle_merged in zip(handles_long, handles_small, handles_merged):
         x_min, x_max, y_min, y_max = get_common_axis_limits([handle_small, handle_long])
         plt.figure(handle_merged)
@@ -300,6 +328,7 @@ def exercise1c(time_param):
         plt.ylim(y_min, y_max)
         plt.grid()
         plt.legend(merged_legends, prop={'size': 8})
+    # endregion
 
 
 def exercise1d():
