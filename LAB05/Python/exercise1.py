@@ -121,7 +121,7 @@ def add_l_opt_marker(handle, l_opt=None):
         l_opt = muscle_parameters.l_opt
     plt.figure(handle)
     plt.axvline(x=l_opt, color="k")
-    plt.text(l_opt+0.001, 1500, "L_opt", rotation=-90, color="k")
+    plt.text(l_opt+0.001, 2000, "L_opt", rotation=-90, color="k")
 
 
 def get_common_axis_limits(handles):
@@ -138,7 +138,6 @@ def get_common_axis_limits(handles):
         x_max = max(x_max, x_top)
         y_min = min(y_min, y_bot)
         y_max = max(y_max, y_top)
-
     return x_min, x_max, y_min, y_max
 
 
@@ -275,7 +274,8 @@ def exercise1c(time_param):
     handles_long = ["1_c_lce_iso_long", "1_c_lsl_iso_long", "1_c_lmtc_long"]
     handles_small = ["1_c_lce_iso_small", "1_c_lsl_iso_small", "1_c_lmtc_small"]
     handles_merged = ["1_c_lce_iso_merged", "1_c_lsl_iso_merged", "1_c_lmtc_merged"]
-
+    merged_legends = ["Active force, l_opt=0.5", "Passive force, l_opt=0.5", "Total force, l_opt=0.5", "_nolegend_",
+                      "Active force, l_opt=0.25", "Passive force, l_opt=0.25", "Total force, l_opt=0.25"]
     active_force_long, passive_force_long, total_force_long, l_ce_long, l_slack_long, l_mtc_long = \
         iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_long)
     active_force_small, passive_force_small, total_force_small, l_ce_small, l_slack_small, l_mtc_small = \
@@ -292,13 +292,14 @@ def exercise1c(time_param):
                         handle=handles_merged, l_opt=l_opt_long)
     plot_isometric_data(active_force_small, passive_force_small, total_force_small, l_ce_small, l_slack_small,
                         l_mtc_small, handle=handles_merged, l_opt=l_opt_small)
-    for graphs in zip(handles_long, handles_small, handles_merged):
-        x_min, x_max, y_min, y_max = get_common_axis_limits(graphs[0:1])
-        plt.figure(graphs[2])
-        print(x_min, x_max, y_min, y_max)
+
+    for handle_long, handle_small, handle_merged in zip(handles_long, handles_small, handles_merged):
+        x_min, x_max, y_min, y_max = get_common_axis_limits([handle_small, handle_long])
+        plt.figure(handle_merged)
         plt.xlim(x_min, x_max)
         plt.ylim(y_min, y_max)
         plt.grid()
+        plt.legend(merged_legends, prop={'size': 8})
 
 
 def exercise1d():
