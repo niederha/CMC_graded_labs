@@ -135,7 +135,7 @@ class IsotonicMuscleSystem(object):
 
         Example:
         --------
-            >>> import nump as np
+            >>> import numpy as np
             >>> from muscle import Muscle
             >>> from mass import Mass
             >>> from system_parameters import MuscleParameters, MassParameters
@@ -144,8 +144,7 @@ class IsotonicMuscleSystem(object):
             >>> isotonic_system = IsotonicMuscleSystem()
             >>> isotonic_system.add_muscle(muscle)
             >>> # Initial state
-            >>> x0 = [0, isotonic_system.muscle.L_OPT,
-                isotonic_system.muscle.L_OPT+isotonic_system.muscle.L_SLACK, 0.0]
+            >>> x0 = [0, isotonic_system.muscle.L_OPT, isotonic_system.muscle.L_OPT+isotonic_system.muscle.L_SLACK, 0.0]
             >>> time_step = 0.001
             >>> t_start = 0.0
             >>> t_stop = 0.3
@@ -158,8 +157,7 @@ class IsotonicMuscleSystem(object):
             >>> # Set the muscle stimulation to which you want to evaluate
             >>> muscle_stimulation = 0.5
             >>> args = (muscle_stimulation, load)
-            >>> result = isotonic_system.integrate(x0, time, time_step,
-                time_stabilize, args)
+            >>> result = isotonic_system.integrate(x0, time, time_step, time_stabilize, args)
             >>> # results contain the states and the internal muscle
             >>> # attributes neccessary to complete the exercises
 
