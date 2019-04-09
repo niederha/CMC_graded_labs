@@ -17,6 +17,7 @@ DEFAULT["label"] = [r"$\theta$ [rad]", r"$d\theta/dt$ [rad/s]"]
 
 # Global settings for plotting
 # You may change as per your requirement
+plt.rcParams['figure.figsize'] = [9, 6]
 plt.rc('lines', linewidth=2.0)
 plt.rc('font', size=12.0)
 plt.rc('axes', titlesize=14.0)      # fontsize of the axes title
