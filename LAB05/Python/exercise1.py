@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from enum import Enum, unique
 
 import cmc_pylog as pylog
 from muscle import Muscle
@@ -12,6 +13,7 @@ from cmcpack.plot import save_figure
 from system_parameters import MuscleParameters, MassParameters
 from isometric_muscle_system import IsometricMuscleSystem
 from isotonic_muscle_system import IsotonicMuscleSystem
+from time_parameters import TimeParameters
 
 DEFAULT["label"] = [r"$\theta$ [rad]", r"$d\theta/dt$ [rad/s]"]
 
@@ -27,14 +29,20 @@ plt.rc('ytick', labelsize=14.0)     # fontsize of the tick labels
 plt.figure(figsize=(8.0, 5.0))      # figure size in inches
 
 
-class TimeParameters:
-    """Used to pass the time infos for the simulation in an easier way"""
+@unique
+class StatesIsometric(Enum):
+    STIMULATION = 0
+    L_CE = 1
+    NB_STATES = 2
 
-    def __init__(self, t_start=0.0, t_stop=0.2, t_step=0.001):
-        self.t_start = t_start
-        self.t_stop = t_stop
-        self.step = t_step
-        self.times = np.arange(self.t_start, self.t_stop, self.step)
+
+@unique
+class StatesIsotonic(Enum):
+    STIMULATION = 0
+    L_CE = 1
+    LOAD_POS = 2
+    LOAD_SPEED = 3
+    NB_STATES = 4
 
 
 def find_ce_stretch_iso(muscle_sys, ce_stretch, time_param, stimulation=1, error_max=0.01):
@@ -50,7 +58,7 @@ def find_ce_stretch_iso(muscle_sys, ce_stretch, time_param, stimulation=1, error
     while True:
         result = muscle_sys.integrate(x0=x0,
                                       time=time_param.times,
-                                      time_step=time_param.step,
+                                      time_step=time_param.t_step,
                                       stimulation=stimulation,
                                       muscle_length=stretch)
         if minimal_ce_stretch is None:
@@ -178,7 +186,9 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
     muscle_stretch_max = find_ce_stretch_iso(sys, ce_stretch_max, time_param)
     muscle_stretch_min = find_ce_stretch_iso(sys, ce_stretch_min, time_param)
     stretches = np.arange(muscle_stretch_min, muscle_stretch_max, muscle_stretch_max / nb_pts)
-    x0 = [0.0, sys.muscle.L_OPT]
+    x0 = [0]*StatesIsometric.NB_STATES.value
+    x0[StatesIsometric.STIMULATION.value] = 0
+    x0[StatesIsometric.L_CE.value] = sys.muscle.L_OPT
 
     # Containers
     active_force = []
@@ -192,7 +202,7 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
     for stretch in stretches:
         result = sys.integrate(x0=x0,
                                time=time_param.times,
-                               time_step=time_param.step,
+                               time_step=time_param.t_step,
                                stimulation=muscle_stimulation,
                                muscle_length=stretch)
         active_force.append(result.active_force[-1])
@@ -332,54 +342,34 @@ def exercise1c(time_param):
     # endregion
 
 
-def exercise1d():
+def exercise1d(time_param):
     """ Exercise 1d
-
     Under isotonic conditions external load is kept constant.
     A constant stimulation is applied and then suddenly the muscle
     is allowed contract. The instantaneous velocity at which the muscle
     contracts is of our interest."""
 
-    # Definition of muscles
-    muscle_parameters = MuscleParameters()
-    print(muscle_parameters.showParameters())
-
-    mass_parameters = MassParameters()
-    print(mass_parameters.showParameters())
-
-    # Create muscle object
-    muscle = Muscle(muscle_parameters)
-
-    # Create mass object
-    mass = Mass(mass_parameters)
-
-    pylog.warning("Isotonic muscle contraction to be implemented")
-
-    # Instantiate isotonic muscle system
-    sys = IsotonicMuscleSystem()
-
-    # Add the muscle to the system
-    sys.add_muscle(muscle)
-
-    # Add the mass to the system
-    sys.add_mass(mass)
-
-    # You can still access the muscle inside the system by doing
-    # >>> sys.muscle.L_OPT # To get the muscle optimal length
-
-    # Evaluate for a single load
+    # Parameters
     load = 100.
-
-    # Evaluate for a single muscle stimulation
     muscle_stimulation = 1.
 
+    # System definition
+    muscle_parameters = MuscleParameters()
+    muscle = Muscle(muscle_parameters)
+
+    mass_parameters = MassParameters()
+    mass = Mass(mass_parameters)
+
+    sys = IsotonicMuscleSystem()
+    sys.add_muscle(muscle)
+    sys.add_mass(mass)
+
     # Set the initial condition
-    x0 = [0.0, sys.muscle.L_OPT,
-          sys.muscle.L_OPT + sys.muscle.L_SLACK, 0.0]
-    # x0[0] - -> activation
-    # x0[1] - -> contractile length(l_ce)
-    # x0[2] - -> position of the mass/load
-    # x0[3] - -> velocity of the mass/load
+    x0 = [0]*StatesIsotonic.NB_STATES.value
+    x0[StatesIsotonic.STIMULATION.value] = 0.
+    x0[StatesIsotonic.L_CE.value] = sys.muscle.L_OPT
+    x0[StatesIsotonic.LOAD_POS.value] = sys.muscle.L_OPT + sys.muscle.L_SLACK
+    x0[StatesIsotonic.LOAD_SPEED.value] = 0.
 
     # Set the time for integration
     t_start = 0.0
@@ -412,9 +402,10 @@ def exercise1():
     time_param = TimeParameters(0.0, 0.2, 0.001)
 
     # exercise1a(time_param)
-    # exercise1b(time_param)
-    exercise1c(time_param)
-    # exercise1d()
+    exercise1b(time_param)
+    # exercise1c(time_param)
+    time_param.t_stop = 0.3
+    # exercise1d(time_param)
 
     if DEFAULT["save_figures"] is False:
         plt.show()
