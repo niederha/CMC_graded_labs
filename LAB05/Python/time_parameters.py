@@ -1,3 +1,5 @@
+import numpy as np
+
 
 class TimeParameters:
     """Used to pass the time infos for the simulation in an easier way"""

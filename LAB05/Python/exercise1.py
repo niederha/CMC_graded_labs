@@ -371,19 +371,11 @@ def exercise1d(time_param):
     x0[StatesIsotonic.LOAD_POS.value] = sys.muscle.L_OPT + sys.muscle.L_SLACK
     x0[StatesIsotonic.LOAD_SPEED.value] = 0.
 
-    # Set the time for integration
-    t_start = 0.0
-    t_stop = 0.3
-    time_step = 0.001
-    time_stabilize = 0.2
-
-    time = np.arange(t_start, t_stop, time_step)
-
     # Run the integration
     result = sys.integrate(x0=x0,
-                           time=time,
-                           time_step=time_step,
-                           time_stabilize=time_stabilize,
+                           time=time_param.times,
+                           time_step=time_param.t_step,
+                           time_stabilize=time_param.t_step,
                            stimulation=muscle_stimulation,
                            load=load)
 
@@ -402,10 +394,10 @@ def exercise1():
     time_param = TimeParameters(0.0, 0.2, 0.001)
 
     # exercise1a(time_param)
-    exercise1b(time_param)
+    # exercise1b(time_param)
     # exercise1c(time_param)
     time_param.t_stop = 0.3
-    # exercise1d(time_param)
+    exercise1d(time_param)
 
     if DEFAULT["save_figures"] is False:
         plt.show()
