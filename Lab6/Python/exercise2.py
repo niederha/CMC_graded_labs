@@ -50,7 +50,7 @@ def exercise2():
     """
     
     #----------------# Exercise 2a #----------------#
-    
+    """
     theta = np.linspace(-np.pi/4, np.pi/4,num=50)
     h1=[]
     a1= 1
@@ -82,7 +82,7 @@ def exercise2():
     plt.legend()
     plt.figure('2a_Moment_arm_vs_Theta')
     plt.legend()
-    
+    """
     #----------------# Exercise 2a finished #----------------#
     
     
@@ -157,21 +157,30 @@ def exercise2():
         #----------------# Exercise 2c #----------------#
         
         w = np.linspace(0.2,4,4)
-    
+#        w = 0.5
+#        a = np.linspace(0.1,1,4)
         plt.figure('2c_LimitCycle_'+str(act))
+#        plt.figure('2c_LimitCycle_Amplitude_'+str(act))
         plt.title('Pendulum Phase')
         
         plt.figure('2c_Amplitude_'+str(act))
+#        plt.figure('2c_Amplitude_Amplitude_'+str(act))
         plt.title('Amplitude vs. Frequency')
+#        plt.title('Amplitude vs. Stimulation Amplitude')
         
         for i in range(0,len(w)):
+#        for i in range(0,len(a)):
+#            plt.figure('2c_LimitCycle_Amplitude_'+str(act))
             plt.figure('2c_LimitCycle_'+str(act))
             print('Running simulation %d out of %d'%(i+1,len(w)))
+#            print('Running simulation %d out of %d'%(i+1,len(a)))
             
             if act == 'sin':
                 sinAct = np.sin(2*np.pi*w[i]*time).reshape(len(time),1)
+#                sinAct = a[i]*np.sin(2*np.pi*w*time).reshape(len(time),1)
             else:
                 sinAct = signal.square(2*np.pi*w[i]*time).reshape(len(time),1)
+#                sinAct = a[i]*signal.square(2*np.pi*w*time).reshape(len(time),1)
                 
             sinFlex = sinAct.copy()
             sinFlex[sinAct<0] = 0 
@@ -217,17 +226,24 @@ def exercise2():
             # Plotting the results
             
             plt.plot(res[:, 1], res[:, 2], label='Act. $%s(2\cdot{}\\pi\cdot{}%.1f\cdot{}t)$'%(act,w[i]))
-            
+#            plt.plot(res[:, 1], res[:, 2], label='Act. $%.1f\cdot{}%s(2\cdot{}\\pi\cdot{}0.5\cdot{}t)$'%(a[i],act))
             plt.figure('2c_Amplitude_'+str(act))
             plt.plot(time,res[:, 1], label='Frequency = %.1f'%(w[i]))
             
+#            plt.figure('2c_Amplitude_Amplitude_'+str(act))
+#            plt.plot(time,res[:, 1], label='Amplitude = %.1f'%(a[i]))
+            
+            
         plt.figure('2c_LimitCycle_'+str(act))
+#        plt.figure('2c_LimitCycle_Amplitude_'+str(act))
+        
         plt.xlabel('Position [rad]')
         plt.ylabel('Velocity [rad/s]')
         plt.grid()
         plt.legend()
         
         plt.figure('2c_Amplitude_'+str(act))
+#        plt.figure('2c_Amplitude_Amplitude_'+str(act))
         plt.xlabel('Time [s]')
         plt.ylabel('Amplitude [rad]')
         plt.grid()
@@ -236,7 +252,7 @@ def exercise2():
         #----------------# Exercise 2c finished #----------------#
         
         #----------------# Exercise 2b #----------------#
-    
+    """
         w = 0.5
         if act == 'sin':
             sinAct = np.sin(2*np.pi*w*time).reshape(len(time),1)
@@ -300,7 +316,7 @@ def exercise2():
         plt.ylabel('Activation')
         plt.grid()
         plt.legend()
-        
+    """    
         #----------------# Exercise 2b finished #----------------#
     
     # To animate the model, use the SystemAnimation class
