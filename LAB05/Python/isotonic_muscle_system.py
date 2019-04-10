@@ -56,7 +56,7 @@ class IsotonicMuscleSystem(object):
                         muscle.__class__))
                 raise TypeError()
             else:
-                pylog.info('Added new muscle model to the system')
+                # pylog.info('Added new muscle model to the system')
                 self.muscle = muscle
 
     def add_mass(self, mass):
@@ -85,7 +85,7 @@ class IsotonicMuscleSystem(object):
                     'Trying to set of type {} to mass'.format(mass.__class__))
                 raise TypeError()
             else:
-                pylog.info('Added new mass model to the system')
+                # pylog.info('Added new mass model to the system')
                 self.mass = mass
 
     def integrate(self, x0, time, time_step=None, time_stabilize=0.1,
@@ -183,10 +183,10 @@ class IsotonicMuscleSystem(object):
         self.mass.parameters.mass = load
 
         #: Integration
-        pylog.info(
-            "Begin isometric test with load {} and "
-            "muscle activation {}".format(load, stimulation))
-        #: Instatiate the muscle results container
+        # pylog.info(
+        #     "Begin isometric test with load {} and "
+        #     "muscle activation {}".format(load, stimulation))
+        #: Instantiate the muscle results container
         self.muscle.instantiate_result_from_state(time)
 
         #: Integrate the model until stabilization

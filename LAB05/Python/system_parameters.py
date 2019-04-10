@@ -542,7 +542,7 @@ class MassParameters(SystemParameters):
         """ Keyword Arguments:
             value --  Set the value of mass"""
         if value <= 0.00001:
-            biolog.error(
+            pylog.error(
                 "Mass you are trying to set is too low!. Setting to 1.")
             value = 1.0
         self.parameters["mass"] = value

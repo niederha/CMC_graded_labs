@@ -1,8 +1,10 @@
 """ Lab 5 - Exercise 1 """
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import math
+from tqdm import tqdm
 from enum import Enum, unique
 
 import cmc_pylog as pylog
@@ -159,8 +161,8 @@ def get_common_axis_limits(handles):
     return x_min, x_max, y_min, y_max
 
 
-def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
-                   time_param=TimeParameters(), l_opt=None):
+def isometric_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5, nb_pts=1000,
+                         time_param=TimeParameters(), l_opt=None):
     """ Runs a experiments in isometric mode for multiple stretches, returns the results
     Parameters:
         - muscle_stimulation: applied stimulation.
@@ -177,7 +179,6 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
     parameters = MuscleParameters()
     if l_opt is not None:
         parameters.l_opt = l_opt
-    pylog.info(parameters.showParameters())
     muscle = Muscle(parameters)
     sys = IsometricMuscleSystem()
     sys.add_muscle(muscle)
@@ -199,7 +200,8 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
     l_mtc = []
 
     # Experiences
-    for stretch in stretches:
+    pylog.info("Running isometric experiments for stretches (this might take a while)...")
+    for stretch in tqdm(stretches):
         result = sys.integrate(x0=x0,
                                time=time_param.times,
                                time_step=time_param.t_step,
@@ -215,6 +217,57 @@ def iso_experiment(muscle_stimulation=1., ce_stretch_max=1.5, ce_stretch_min=0.5
     return active_force, passive_force, total_force, l_ce, l_slack, l_mtc
 
 
+def isotonic_experiment(muscle_stimulation, loads, time_param=TimeParameters()):
+
+    # Muscle
+    muscle_parameters = MuscleParameters()
+    muscle = Muscle(muscle_parameters)
+
+    # Initial conditions
+    x0 = [0] * StatesIsotonic.NB_STATES.value
+    x0[StatesIsotonic.STIMULATION.value] = 0.
+    x0[StatesIsotonic.L_CE.value] = muscle.L_OPT
+    x0[StatesIsotonic.LOAD_POS.value] = muscle.L_OPT + muscle.L_SLACK
+    x0[StatesIsotonic.LOAD_SPEED.value] = 0.
+
+    # Containers
+    v_ce = []
+    tendon_force = []
+
+    # Integration
+    pylog.info("Running the experiments (this might take a while)...")
+    for load in tqdm(loads):
+
+        # New load definition
+        mass_parameters = MassParameters()
+        mass_parameters.mass = load
+        mass = Mass(mass_parameters)
+
+        # System definition
+        sys = IsotonicMuscleSystem()
+        sys.add_muscle(muscle)
+        sys.add_mass(mass)
+
+        result = sys.integrate(x0=x0,
+                               time=time_param.times,
+                               time_step=time_param.t_step,
+                               time_stabilize=time_param.t_stabilize,
+                               stimulation=muscle_stimulation,
+                               load=load)
+
+        # Result processing
+        if result.l_mtc[-1] > x0[StatesIsotonic.LOAD_POS.value]:
+            # Extension
+            v_ce.append(result.v_ce.max())
+            tendon_force.append(result.tendon_force[-1])
+        else:
+            # Contraction
+            v_ce.append(result.v_ce.min())
+            tendon_force.append(result.tendon_force[-1])
+
+    return v_ce, tendon_force
+
+
 def exercise1a(time_param):
     """ Runs and plot the length-force relationship for a muscle in isometric conditions."""
     pylog.info("Part a")
@@ -227,8 +280,11 @@ def exercise1a(time_param):
     handles = ["1_a_lce_vs_str", "1_a_lsl_vs_str", "1_a_lmtc_vs_str"]
 
     # Experiment
-    active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(muscle_stimulation, ce_stretch_max,
-                                                                                    ce_stretch_min, nb_pts, time_param,)
+    active_force, passive_force, total_force, l_ce, l_slack, l_mtc = isometric_experiment(muscle_stimulation,
+                                                                                          ce_stretch_max,
+                                                                                          ce_stretch_min,
+                                                                                          nb_pts,
+                                                                                          time_param,)
     # Plotting
     plot_isometric_data(active_force, passive_force, total_force, l_ce, l_slack, l_mtc, handle=handles)
 
@@ -266,10 +322,12 @@ def exercise1b(time_param):
     # region Experiences (expect it to take some time)
     for stim in stimulations:
         # Running the integration
-        active_force, passive_force, total_force, l_ce, l_slack, l_mtc = iso_experiment(stim,
-                                                                                        ce_stretch_max,
-                                                                                        ce_stretch_min, nb_pts,
-                                                                                        time_param)
+        pylog.info("Running isometric experiences for stimulation={}".format(stim))
+        active_force, passive_force, total_force, l_ce, l_slack, l_mtc = isometric_experiment(stim,
+                                                                                              ce_stretch_max,
+                                                                                              ce_stretch_min,
+                                                                                              nb_pts,
+                                                                                              time_param)
         # adding active force
         lengths = [l_ce, l_slack, l_mtc]
         force_legends.append("Active force, stimulation={}".format(stim))
@@ -305,10 +363,12 @@ def exercise1c(time_param):
     # endregion
 
     # region Experiments
+    pylog.info("Running isometric experiment for long ce")
     active_force_long, passive_force_long, total_force_long, l_ce_long, l_slack_long, l_mtc_long = \
-        iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_long)
+        isometric_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_long)
+    pylog.info("Running isometric experiment for small ce")
     active_force_small, passive_force_small, total_force_small, l_ce_small, l_slack_small, l_mtc_small = \
-        iso_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_small)
+        isometric_experiment(stim, ce_stretch_max, ce_stretch_min, nb_pts, time_param, l_opt_small)
     # endregion
 
     # region Plots
@@ -343,71 +403,95 @@ def exercise1c(time_param):
 
 
 def exercise1d(time_param):
-    """ Exercise 1d
-    Under isotonic conditions external load is kept constant.
-    A constant stimulation is applied and then suddenly the muscle
-    is allowed contract. The instantaneous velocity at which the muscle
-    contracts is of our interest."""
+    """ Plots the v_ce-force relationship by running experiment with multiple weights."""
+    pylog.info("Exercise 1d")
 
     # Parameters
-    load = 100.
+    load_min = 20
+    load_max = 300
+    nb_loads = 1000
+    load = np.linspace(load_min, load_max, num=nb_loads)
     muscle_stimulation = 1.
 
-    # System definition
-    muscle_parameters = MuscleParameters()
-    muscle = Muscle(muscle_parameters)
-
-    mass_parameters = MassParameters()
-    mass = Mass(mass_parameters)
-
-    sys = IsotonicMuscleSystem()
-    sys.add_muscle(muscle)
-    sys.add_mass(mass)
-
-    # Set the initial condition
-    x0 = [0]*StatesIsotonic.NB_STATES.value
-    x0[StatesIsotonic.STIMULATION.value] = 0.
-    x0[StatesIsotonic.L_CE.value] = sys.muscle.L_OPT
-    x0[StatesIsotonic.LOAD_POS.value] = sys.muscle.L_OPT + sys.muscle.L_SLACK
-    x0[StatesIsotonic.LOAD_SPEED.value] = 0.
-
-    # Run the integration
-    result = sys.integrate(x0=x0,
-                           time=time_param.times,
-                           time_step=time_param.t_step,
-                           time_stabilize=time_param.t_step,
-                           stimulation=muscle_stimulation,
-                           load=load)
+    # Experiment
+    v_ce, tendon_force = isotonic_experiment(loads=load, muscle_stimulation=muscle_stimulation, time_param=time_param)
 
     # Plotting
-    plt.figure('Isotonic muscle experiment')
-    plt.plot(result.time, result.v_ce)
+    plt.figure('1_d_isotonic_load_var')
+    plt.plot(v_ce, tendon_force)
     plt.title('Isotonic muscle experiment')
-    plt.xlabel('Time [s]')
-    plt.ylabel('Muscle contractilve velocity')
+    plt.xlabel('Contractile element velocity [m/s]')
+    plt.ylabel('Tendon force [N]')
+    plt.axvline(x=0, color="k")
+    plt.text(0.001, 750, "Equilibrium (v=0)", rotation=-90, color="k")
     plt.grid()
+
+
+def exercise1e(time_param):
+    """ Plots the v_ce-force relationship by running experiment with multiple weights and multiple stimlations."""
+    pylog.info("Exercise 1e")
+
+    # Parameters
+    load_min = 20
+    load_max = 300
+    nb_loads = 1000
+    load = np.linspace(load_min, load_max, num=nb_loads)
+
+    stimulation_min = 0
+    stimulation_max = 1
+    nb_stimulation = 10
+    stimulations = np.linspace(stimulation_min, stimulation_max, num=nb_stimulation)
+
+    # Containers for 3D plots
+    v_ce_3d = np.zeros(shape=(nb_stimulation, nb_loads))
+    tendon_force_3d = np.zeros(shape=(nb_stimulation, nb_loads))
+    stimulations_3d = np.ones(shape=(nb_stimulation, nb_loads))
+    # Experiment
+    for i, stimulation in enumerate(stimulations):
+        v_ce, tendon_force = isotonic_experiment(loads=load, muscle_stimulation=stimulation, time_param=time_param)
+
+        v_ce_3d[i, :] = v_ce
+        tendon_force_3d[i, :] = tendon_force
+        stimulations_3d[i, :] *= stimulation
+
+        # Plotting
+        plt.figure('1_d_isotonic_stim_var')
+        plt.plot(v_ce, tendon_force, label='stimulation={}'.format(stimulation))
+        plt.title('Isotonic muscle experiment')
+        plt.xlabel('Contractile element velocity [m/s]')
+        plt.ylabel('Tendon force [N]')
+
+    plt.legend()
+    plt.grid()
+
+    # 3d plot
+    fig = plt.figure('1_d_isotonic_3d')
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(stimulations_3d, v_ce_3d, tendon_force_3d)
+    ax.set_xlabel('Stimulation')
+    ax.set_ylabel('Contractile element velocity [m/s]')
+    ax.set_zlabel('Tendon force [N]')
 
 
 def exercise1():
     plt.close("all")
     pylog.info("Start exercise 1")
-    time_param = TimeParameters(0.0, 0.2, 0.001)
+    time_param = TimeParameters(time_start=0.0, time_stop=0.2, time_step=0.001, time_stabilize=0.2)
 
     # exercise1a(time_param)
     # exercise1b(time_param)
     # exercise1c(time_param)
     time_param.t_stop = 0.3
-    exercise1d(time_param)
+    # exercise1d(time_param)
+    exercise1e(time_param)
 
-    if DEFAULT["save_figures"] is False:
-        plt.show()
-    else:
+    if DEFAULT["save_figures"]:
         figures = plt.get_figlabels()
         pylog.debug("Saving figures:\n{}".format(figures))
         for fig in figures:
             plt.figure(fig)
             save_figure(fig)
-        plt.show()
+    plt.show()
 
 
 if __name__ == '__main__':
