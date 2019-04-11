@@ -4,6 +4,7 @@ import numpy as np
 class TimeParameters:
     """Used to pass the time infos for the simulation in an easier way"""
     def __init__(self, time_start=0.0, time_stop=0.2, time_step=0.001, time_stabilize=0.2):
+        self.nb_pts = None
         self.t_start = None
         self.t_stop = None
         self.t_step = None
@@ -15,7 +16,9 @@ class TimeParameters:
 
     def recompute_times(self):
         if self.t_start is not None and self.t_stop is not None and self.t_step is not None:
-            return np.arange(self.t_start, self.t_stop, self.t_step)
+            new_times = np.arange(self.t_start, self.t_stop, self.t_step)
+            self.nb_pts = len(new_times)
+            return new_times
 
     @property
     def t_start(self):
@@ -46,3 +49,12 @@ class TimeParameters:
         self._t_step = new_t_step
         if new_t_step is not None:
             self.times = self.recompute_times()
+
+    @property
+    def nb_pts(self):
+        return self._nb_pts
+
+    @nb_pts.setter
+    def nb_pts(self, new_nb_pts):
+        self._nb_pts = new_nb_pts
+
