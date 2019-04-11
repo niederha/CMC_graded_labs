@@ -149,7 +149,7 @@ def exercise3b(time_param):
         sim.initalize_system(x0, time_param.times)
         ext_drive = np.ones((time_param.nb_pts, 4))*drive
         ext_drive[0:int(time_param.nb_pts/2), :] *= 0
-        sim.add_external_inputs_to_network()
+        sim.add_external_inputs_to_network(ext_drive)
         sim.simulate()
         res = sim.results()
 
