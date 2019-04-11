@@ -226,7 +226,7 @@ def exercise2b(time_param):
     pylog.info("Exercise 2b")
 
     # Parameters
-    activation_frequency = 1
+    activation_frequency = 0.5
     amplitude = 1
 
     # Experiments
@@ -267,8 +267,8 @@ def exercise2b(time_param):
     # Plot sinus activation
     plt.figure("2_b_activation_rect")
     plt.title("Rectangle activation")
-    plt.plot(time_param.times, act1_rect, label="Activation for muscle 1")
-    plt.plot(time_param.times, act2_rect, label="Activation for muscle 2")
+    plt.plot(time_param.times, act1_rect, label="Flexor")
+    plt.plot(time_param.times, act2_rect, label="Extensor")
     plt.xlabel("Time [s]")
     plt.ylabel("Amplitude")
     plt.legend()
@@ -279,14 +279,14 @@ def exercise2c(time_param):
 
     # Frequency variation parameters
     ref_amplitude = 1.
-    activation_frq_min = 0.5
-    activation_frq_max = 2.
+    activation_frq_min = 0.2
+    activation_frq_max = 4.
     nb_frq = 4
     frequencies = np.linspace(activation_frq_min, activation_frq_max, nb_frq)
 
     # Amplitude variation parameters
-    ref_frq = 1.
-    activation_amplitude_min = 0
+    ref_frq = 0.5
+    activation_amplitude_min = 0.1
     activation_amplitude_max = 1.
     nb_amplitudes = 4
     amplitudes = np.linspace(activation_amplitude_min, activation_amplitude_max, nb_amplitudes)
@@ -384,8 +384,8 @@ def exercise2c(time_param):
 
 def exercise2():
     time_param = TimeParameters(time_start=0, time_stop=5., time_step=0.001)
-    # exercise2a()
-    # exercise2b(time_param)
+    exercise2a()
+    exercise2b(time_param)
     exercise2c(time_param)
     if not DEFAULT["save_figures"]:
         plt.show()

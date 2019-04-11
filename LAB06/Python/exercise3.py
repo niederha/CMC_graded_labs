@@ -114,7 +114,7 @@ def system_initialisation(l_pendulum=0.5, m_pendulum=1., f_max=1500, l_attach=0.
     sys.add_neural_system(neural_network)  # Add neural network model to the system
 
     # Default initial conditions
-    x0_p = np.array([np.pi / 4, 0.])                # Pendulum initial condition
+    x0_p = np.array([0, 0.])                # Pendulum initial condition
     x0_m = np.array([0., m1.L_OPT, 0., m2.L_OPT])   # Muscle Model initial condition
     x0_n = np.array([-0.5, 1, 0.5, 1])              # Neural Network initial condition
     x0 = np.concatenate((x0_p, x0_m, x0_n))         # System initial conditions
@@ -148,7 +148,7 @@ def exercise3b(time_param):
         sim = SystemSimulation(sys)
         sim.initalize_system(x0, time_param.times)
         ext_drive = np.ones((time_param.nb_pts, 4))*drive
-        ext_drive[0:int(time_param.nb_pts/2), :] *= 0
+        ext_drive[0:int(time_param.nb_pts/4), :] *= 0
         sim.add_external_inputs_to_network(ext_drive)
         sim.simulate()
         res = sim.results()
@@ -158,17 +158,17 @@ def exercise3b(time_param):
 
         # Add marker where external drive was applied
         plt.figure(activation_handle)
-        plt.axvline(time_param.times[int(time_param.nb_pts/2)], color='k')
-        plt.text(time_param.times[int(time_param.nb_pts/2)]+0.1, 0.2, "External input", rotation=-90, color="k")
+        plt.axvline(time_param.times[int(time_param.nb_pts/4)], color='k')
+        plt.text(time_param.times[int(time_param.nb_pts/4)]+0.1, 0.25, "External input", rotation=-90, color="k")
         plt.figure(state_handle)
-        plt.axvline(time_param.times[int(time_param.nb_pts / 2)], color='k')
-        plt.text(time_param.times[int(time_param.nb_pts / 2)] + 0.1, 0.6, "External input", rotation=-90, color="k")
+        plt.axvline(time_param.times[int(time_param.nb_pts / 4)], color='k')
+        plt.text(time_param.times[int(time_param.nb_pts / 4)] + 0.1, -0.02, "External input", rotation=-90, color="k")
 
 
 def exercise3():
 
     time_param = TimeParameters(time_start=0, time_stop=10., time_step=0.001)
-    # exercise3a(time_param)
+    exercise3a(time_param)
     exercise3b(time_param)
 
     if DEFAULT["save_figures"]:
