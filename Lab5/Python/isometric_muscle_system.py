@@ -19,34 +19,11 @@ class IsometricMuscleSystem(object):
     """
 
     def __init__(self):
-        """ Initialization.
-        Parameters
-        ----------
-        None
-
-        Example:
-        -------
-        >>> isometric_system = IsometricMuscleSystem()
-        """
         super(IsometricMuscleSystem, self).__init__()
         self.muscle = None
 
     def add_muscle(self, muscle):
-        """Add the muscle model to the system.
 
-        Parameters
-        ----------
-        muscle: <Muscle>
-            Instance of muscle model
-
-        Example:
-        --------
-        >>> from muscle import Muscle
-        >>> from system_parameters import MuscleParameters
-        >>> muscle = Muscle(MuscleParameters()) #: Default muscle
-        >>> isometric_system = IsometricMuscleSystem()
-        >>> isometric_system.add_muscle(muscle)
-        """
         if self.muscle is not None:
             pylog.warning(
                 'You have already added the muscle model to the system.')
@@ -100,36 +77,6 @@ class IsometricMuscleSystem(object):
                 Muscle passive force
             result.tendon_force :
                 Muscle tendon force
-
-        Example:
-        --------
-            >>> import nump as np
-            >>> from muscle import Muscle
-            >>> from system_parameters import MuscleParameters
-            >>> muscle = Muscle(MuscleParameters()) #: Default muscle
-            >>> isometric_system = IsometricMuscleSystem()
-            >>> isometric_system.add_muscle(muscle)
-            >>> # Initial state
-            >>> x0 = [0, isometric_system.muscle.L_OPT]
-            >>> time_step = 0.001
-            >>> t_start = 0.0
-            >>> t_stop = 0.2
-            >>> #: Time
-            >>> time = np.arange(t_start, t_stop, time_step)
-            >>> # Args take stimulation and muscle_length as input
-            >>> # Set the muscle length to which you want to evaluate
-            >>> muscle_stretch = 0.25
-            >>> # Set the muscle stimulation to which you want to evaluate
-            >>> muscle_stimulation = 0.5
-            >>> args = (muscle_stimulation, muscle_stretch)
-            >>> result = isometric_system.integrate(x0, time, time_step, args)
-            >>> # results contain the states and the internal muscle
-            >>> # attributes neccessary to complete the exercises
-
-        The above example shows how to run the isometric condition once.
-        In the exercise1.py file you have to use this setup to loop
-        over multiple muscle stretch/muscle stimulation values to answer
-        the questions.
         """
 
         #: If time step is not provided then compute it from the time vector
@@ -142,10 +89,8 @@ class IsometricMuscleSystem(object):
             muscle_length = self.muscle.L_OPT + self.muscle.L_SLACK
 
         #: Integration
-#        pylog.info(
-#            "Begin isometric test with muscle stretch {} and "
-#            "muscle activation {}".format(muscle_length, stimulation))
-        #: Instatiate the muscle results container
+
+        #: Instantiate the muscle results container
         self.muscle.instantiate_result_from_state(time)
 
         #: Run step integration

@@ -59,15 +59,6 @@ class Muscle(object):
         --------
         step : func
             Integrates muscle state by time step dt
-
-        Example:
-        --------
-        >>> from SystemParameters import MuscleParameters
-        >>> import Muscle
-        >>> muscle_parameters = MuscleParameters()
-        >>> muscle1 = Muscle.Muscle(muscle_parameters)
-        >>> muscle1.stim = 0.01
-        >>> muscle1.step(dt)
         """
 
         self.parameters = parameters
@@ -110,7 +101,7 @@ class Muscle(object):
 
     @property
     def l_ce(self):
-        """ Length of muscle contracticle element."""
+        """ Length of muscle contractile element."""
         return self._l_ce
 
     @property

@@ -56,7 +56,7 @@ class IsotonicMuscleSystem(object):
                         muscle.__class__))
                 raise TypeError()
             else:
-                pylog.info('Added new muscle model to the system')
+                # pylog.info('Added new muscle model to the system')
                 self.muscle = muscle
 
     def add_mass(self, mass):
@@ -85,7 +85,7 @@ class IsotonicMuscleSystem(object):
                     'Trying to set of type {} to mass'.format(mass.__class__))
                 raise TypeError()
             else:
-                pylog.info('Added new mass model to the system')
+                # pylog.info('Added new mass model to the system')
                 self.mass = mass
 
     def integrate(self, x0, time, time_step=None, time_stabilize=0.1,
@@ -135,7 +135,7 @@ class IsotonicMuscleSystem(object):
 
         Example:
         --------
-            >>> import nump as np
+            >>> import numpy as np
             >>> from muscle import Muscle
             >>> from mass import Mass
             >>> from system_parameters import MuscleParameters, MassParameters
@@ -144,8 +144,7 @@ class IsotonicMuscleSystem(object):
             >>> isotonic_system = IsotonicMuscleSystem()
             >>> isotonic_system.add_muscle(muscle)
             >>> # Initial state
-            >>> x0 = [0, isotonic_system.muscle.L_OPT,
-                isotonic_system.muscle.L_OPT+isotonic_system.muscle.L_SLACK, 0.0]
+            >>> x0 = [0, isotonic_system.muscle.L_OPT, isotonic_system.muscle.L_OPT+isotonic_system.muscle.L_SLACK, 0.0]
             >>> time_step = 0.001
             >>> t_start = 0.0
             >>> t_stop = 0.3
@@ -158,8 +157,7 @@ class IsotonicMuscleSystem(object):
             >>> # Set the muscle stimulation to which you want to evaluate
             >>> muscle_stimulation = 0.5
             >>> args = (muscle_stimulation, load)
-            >>> result = isotonic_system.integrate(x0, time, time_step,
-                time_stabilize, args)
+            >>> result = isotonic_system.integrate(x0, time, time_step, time_stabilize, args)
             >>> # results contain the states and the internal muscle
             >>> # attributes neccessary to complete the exercises
 
@@ -185,10 +183,10 @@ class IsotonicMuscleSystem(object):
         self.mass.parameters.mass = load
 
         #: Integration
-#        pylog.info(
-#            "Begin isometric test with load {} and "
-#            "muscle activation {}".format(load, stimulation))
-        #: Instatiate the muscle results container
+        # pylog.info(
+        #     "Begin isometric test with load {} and "
+        #     "muscle activation {}".format(load, stimulation))
+        #: Instantiate the muscle results container
         self.muscle.instantiate_result_from_state(time)
 
         #: Integrate the model until stabilization
