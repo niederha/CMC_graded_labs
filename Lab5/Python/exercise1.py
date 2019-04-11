@@ -482,11 +482,11 @@ def exercise1():
     time_param = TimeParameters(time_start=0.0, time_stop=0.2, time_step=0.001, time_stabilize=0.2)
 
     exercise1a(time_param)
-    exercise1b(time_param)
-    exercise1c(time_param)
-    time_param.t_stop = 0.3  # change time parameters for the second part
-    exercise1d(time_param)
-    exercise1e(time_param)
+    # exercise1b(time_param)
+    # exercise1c(time_param)
+    # time_param.t_stop = 0.3  # change time parameters for the second part
+    # exercise1d(time_param)
+    # exercise1e(time_param)
 
     if DEFAULT["save_figures"]:
         figures = plt.get_figlabels()
