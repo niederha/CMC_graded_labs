@@ -50,7 +50,7 @@ def exercise2():
     """
     
     #----------------# Exercise 2a #----------------#
-    """
+
     theta = np.linspace(-np.pi/4, np.pi/4,num=50)
     h1=[]
     a1= 1
@@ -82,7 +82,7 @@ def exercise2():
     plt.legend()
     plt.figure('2a_Moment_arm_vs_Theta')
     plt.legend()
-    """
+
     #----------------# Exercise 2a finished #----------------#
     
     
@@ -252,7 +252,7 @@ def exercise2():
         #----------------# Exercise 2c finished #----------------#
         
         #----------------# Exercise 2b #----------------#
-    """
+
         w = 0.5
         if act == 'sin':
             sinAct = np.sin(2*np.pi*w*time).reshape(len(time),1)
@@ -316,7 +316,7 @@ def exercise2():
         plt.ylabel('Activation')
         plt.grid()
         plt.legend()
-    """    
+  
         #----------------# Exercise 2b finished #----------------#
     
     # To animate the model, use the SystemAnimation class
