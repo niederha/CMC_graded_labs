@@ -1,6 +1,7 @@
 """ Lab 5 - Exercise 1 """
 
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import math
@@ -21,14 +22,14 @@ DEFAULT["label"] = [r"$\theta$ [rad]", r"$d\theta/dt$ [rad/s]"]
 
 # Global settings for plotting
 # You may change as per your requirement
-plt.rcParams['figure.figsize'] = [9, 6]
+
 plt.rc('lines', linewidth=2.0)
 plt.rc('font', size=12.0)
 plt.rc('axes', titlesize=14.0)      # fontsize of the axes title
 plt.rc('axes', labelsize=14.0)      # fontsize of the x and y labels
 plt.rc('xtick', labelsize=14.0)     # fontsize of the tick labels
 plt.rc('ytick', labelsize=14.0)     # fontsize of the tick labels
-plt.figure(figsize=(8.0, 5.0))      # figure size in inches
+plt.rcParams['figure.figsize'] = [9, 6  # figure size in inches
 
 
 @unique
@@ -467,7 +468,7 @@ def exercise1e(time_param):
     # 3d plot
     fig = plt.figure('1_d_isotonic_3d')
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(stimulations_3d, v_ce_3d, tendon_force_3d)
+    ax.plot_surface(stimulations_3d, v_ce_3d, tendon_force_3d, cmap=cm.coolwarm)
     ax.set_xlabel('Stimulation')
     ax.set_ylabel('Contractile element velocity [m/s]')
     ax.set_zlabel('Tendon force [N]')
