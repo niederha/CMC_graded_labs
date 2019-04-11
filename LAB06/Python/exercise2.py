@@ -33,27 +33,7 @@ plt.rc('xtick', labelsize=14.0)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=14.0)    # fontsize of the tick labels
 
 
-class TimeParameters:
-
-    def __init__(self, t_init=0, t_final=2.5, t_step=0.001):
-        self.t_init = t_init
-        self.t_final = t_final
-        self.t_step = t_step
-        self.times = np.arange(t_init, t_final, t_step)
-        self.nb_pts = len(self.times)
-
-
 def exercise2():
-    """ Main function to run for Exercise 2.
-
-    Parameters
-    ----------
-        None
-
-    Returns
-    -------
-        None
-    """
 
     time_param = TimeParameters()
 
