@@ -89,12 +89,12 @@ def system_initialisation(l_pendulum=0.5, m_pendulum=1., f_max=1500, l_attach=0.
     return sys, x0
 
 
-def generate_sinus_activation(frq, times):
+def generate_sinus_activation(frq, times, amplitude):
     """ Generates a sine wave activation over times[s](array-like) with frequency frq[Hz]"""
     act1 = np.ones((len(times), 1))
 
     for i, time in enumerate(times):
-        act1[i] = sin(2*pi*frq*time)
+        act1[i] = sin(2*pi*frq*time)*amplitude
     act2 = act1*-1
 
     for i in range(len(times)):
@@ -106,24 +106,24 @@ def generate_sinus_activation(frq, times):
     return act1, act2
 
 
-def generate_rect_activation(frq, times):
+def generate_rect_activation(frq, times, amplitude):
     """ Generates a square wave activation over times[s](array-like) with frequency frq[Hz]"""
-    act1, act2 = generate_sinus_activation(frq, times)
+    act1, act2 = generate_sinus_activation(frq, times, 1)
 
     for i in range(len(times)):
         if act1[i] > 0:
-            act1[i] = 1
+            act1[i] = amplitude
         else:
             act1[i] = 0
         if act2[i] > 0:
-            act2[i] = 1
+            act2[i] =  amplitude
         else:
             act2[i] = 0
 
     return act1, act2
 
 
-def run_oscillation_experiment(time_param, activation_frq, waveform):
+def run_oscillation_experiment(time_param, activation_frq, amplitude, waveform, perturbation = True):
     """ Used to run an oscillation experiment. Returns the results and the activations."""
 
     # Initialisation
@@ -132,16 +132,16 @@ def run_oscillation_experiment(time_param, activation_frq, waveform):
 
     # Activation
     if waveform == Waveform.SIN:
-        act1, act2 = generate_sinus_activation(activation_frq, time_param.times)
+        act1, act2 = generate_sinus_activation(activation_frq, time_param.times, amplitude)
     else:
-        act1, act2 = generate_rect_activation(activation_frq, time_param.times)
+        act1, act2 = generate_rect_activation(activation_frq, time_param.times, amplitude)
 
     activations = np.hstack((act1, act2))
     sim.add_muscle_activations(activations)
 
     # Simulation
     sim.initalize_system(x0, time_param.times)
-    sim.sys.pendulum_sys.parameters.PERTURBATION = True
+    sim.sys.pendulum_sys.parameters.PERTURBATION = perturbation
     sim.simulate()
     res = sim.results()  # [time, states]
     return res, act1, act2
@@ -222,10 +222,17 @@ def exercise2a():
 
 
 def exercise2b(time_param):
+    """ Simulates and generates the phase plot of the system for sine and square activation."""
     pylog.info("Exercise 2b")
+
+    # Parameters
     activation_frequency = 1
-    res_sin, act1_sin, act2_sin = run_oscillation_experiment(time_param, activation_frequency, Waveform.SIN)
-    res_rect, act1_rect, act2_rect = run_oscillation_experiment(time_param, activation_frequency, Waveform.RECT)
+    amplitude = 1
+
+    # Experiments
+    res_sin, act1_sin, act2_sin = run_oscillation_experiment(time_param, activation_frequency, amplitude, Waveform.SIN)
+    res_rect, act1_rect, act2_rect = run_oscillation_experiment(time_param, activation_frequency, amplitude,
+                                                                Waveform.RECT)
 
     # Plot sinus phase
     plt.figure("2_b_phase_plot_sine")
@@ -268,11 +275,118 @@ def exercise2b(time_param):
     plt.grid()
 
 
+def exercise2c(time_param):
+
+    # Frequency variation parameters
+    ref_amplitude = 1.
+    activation_frq_min = 0.5
+    activation_frq_max = 2.
+    nb_frq = 4
+    frequencies = np.linspace(activation_frq_min, activation_frq_max, nb_frq)
+
+    # Amplitude variation parameters
+    ref_frq = 1.
+    activation_amplitude_min = 0
+    activation_amplitude_max = 1.
+    nb_amplitudes = 4
+    amplitudes = np.linspace(activation_amplitude_min, activation_amplitude_max, nb_amplitudes)
+
+    # region Frequency variation experiment
+    for frq in frequencies:
+        res_sin, act1_sin, act2_sin = run_oscillation_experiment(time_param, frq, ref_amplitude,
+                                                                 Waveform.SIN, False)
+        res_rect, act1_rect, act2_rect = run_oscillation_experiment(time_param, frq, ref_amplitude,
+                                                                    Waveform.RECT, False)
+        # Add curves
+        plt.figure("2_c_phase_plot_sine_frq")
+        plt.plot(res_sin[:, 1], res_sin[:, 2], label="Frequency={}[Hz]".format(frq))
+        plt.figure("2_c_state_plot_sine_frq")
+        plt.plot(res_sin[:, 0], res_sin[:, 1], label="Frequency={}[Hz]".format(frq))
+        plt.figure("2_c_phase_plot_rect_frq")
+        plt.plot(res_rect[:, 1], res_rect[:, 2], label="Frequency={}[Hz]".format(frq))
+        plt.figure("2_c_state_plot_rect_frq")
+        plt.plot(res_rect[:, 0], res_rect[:, 1], label="Frequency={}[Hz]".format(frq))
+
+    plt.figure("2_c_phase_plot_sine_frq")
+    plt.title("Phase plot for multiple sine activations frequencies")
+    plt.xlabel(r"$\theta$[rad]")
+    plt.ylabel(r"$\dot{\theta}$[rad/s]")
+    plt.legend()
+    plt.grid()
+
+    plt.figure("2_c_state_plot_sine_frq")
+    plt.title("State plot for multiple sine activations frequencies")
+    plt.xlabel("time[s]")
+    plt.ylabel(r"$\theta$[rad]")
+    plt.legend()
+    plt.grid()
+
+    plt.figure("2_c_phase_plot_rect_frq")
+    plt.title("Phase plot for multiple rect activations frequencies")
+    plt.xlabel(r"$\theta$[rad]")
+    plt.ylabel(r"$\dot{\theta}$[rad/s]")
+    plt.legend()
+    plt.grid()
+
+    plt.figure("2_c_state_plot_rect_frq")
+    plt.title("State plot for multiple rect activations frequencies")
+    plt.xlabel("time[s]")
+    plt.ylabel(r"$\theta$[rad]")
+    plt.legend()
+    plt.grid()
+    # endregion
+
+    # region Amplitude variation experiment
+    for amplitude in frequencies:
+        res_sin, act1_sin, act2_sin = run_oscillation_experiment(time_param, ref_frq, amplitude,
+                                                                 Waveform.SIN, False)
+        res_rect, act1_rect, act2_rect = run_oscillation_experiment(time_param, ref_frq, amplitude,
+                                                                    Waveform.RECT, False)
+        # Add curves
+        plt.figure("2_c_phase_plot_sine_amp")
+        plt.plot(res_sin[:, 1], res_sin[:, 2], label="Amplitude={}[Hz]".format(amplitude))
+        plt.figure("2_c_state_plot_sine_amp")
+        plt.plot(res_sin[:, 0], res_sin[:, 1], label="Amplitude={}[Hz]".format(amplitude))
+        plt.figure("2_c_phase_plot_rect_amp")
+        plt.plot(res_rect[:, 1], res_rect[:, 2], label="Amplitude={}[Hz]".format(amplitude))
+        plt.figure("2_c_state_plot_rect_amp")
+        plt.plot(res_rect[:, 0], res_rect[:, 1], label="Amplitude={}[Hz]".format(amplitude))
+
+    plt.figure("2_c_phase_plot_sine_amp")
+    plt.title("Phase plot for multiple sine activations amplitude")
+    plt.xlabel(r"$\theta$[rad]")
+    plt.ylabel(r"$\dot{\theta}$[rad/s]")
+    plt.legend()
+    plt.grid()
+
+    plt.figure("2_c_state_plot_sine_amp")
+    plt.title("State plot for multiple sine activations amplitude")
+    plt.xlabel("time[s]")
+    plt.ylabel(r"$\theta$[rad]")
+    plt.legend()
+    plt.grid()
+
+    plt.figure("2_c_phase_plot_rect_amp")
+    plt.title("Phase plot for multiple rect activations amplitude")
+    plt.xlabel(r"$\theta$[rad]")
+    plt.ylabel(r"$\dot{\theta}$[rad/s]")
+    plt.legend()
+    plt.grid()
+
+    plt.figure("2_c_state_plot_rect_amp")
+    plt.title("State plot for multiple rect activations amplitude")
+    plt.xlabel("time[s]")
+    plt.ylabel(r"$\theta$[rad]")
+    plt.legend()
+    plt.grid()
+    # endregion
+
+
 def exercise2():
     time_param = TimeParameters(time_start=0, time_stop=5., time_step=0.001)
     # exercise2a()
-    exercise2b(time_param)
-
+    # exercise2b(time_param)
+    exercise2c(time_param)
     if not DEFAULT["save_figures"]:
         plt.show()
     else:
