@@ -10,7 +10,11 @@ from .default import DEFAULT
 
 def save_figure(figure, name=None):
     """ Save figure """
-    path = DEFAULT["save_folder"]
+    if os.path.isdir(DEFAULT["save_folder"]):
+        path = DEFAULT["save_folder"]
+    else:
+        pylog.warning("The DEFAULT save directory does not exist. Switching to current directory")
+        path = os.getcwd()
 
     if DEFAULT["save_figures"]:
         for extension in DEFAULT["save_extensions"]:
