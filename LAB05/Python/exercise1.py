@@ -29,7 +29,7 @@ plt.rc('axes', titlesize=14.0)      # fontsize of the axes title
 plt.rc('axes', labelsize=14.0)      # fontsize of the x and y labels
 plt.rc('xtick', labelsize=14.0)     # fontsize of the tick labels
 plt.rc('ytick', labelsize=14.0)     # fontsize of the tick labels
-plt.rcParams['figure.figsize'] = [9, 6  # figure size in inches
+plt.rcParams['figure.figsize'] = [9, 6 ] # figure size in inches
 
 
 @unique
@@ -259,12 +259,14 @@ def isotonic_experiment(muscle_stimulation, loads, time_param=TimeParameters()):
         # Result processing
         if result.l_mtc[-1] > x0[StatesIsotonic.LOAD_POS.value]:
             # Extension
+            index = result.v_ce.argmax()
             v_ce.append(result.v_ce.max())
-            tendon_force.append(result.tendon_force[-1])
+            tendon_force.append(result.tendon_force[index])
         else:
             # Contraction
+            index = result.v_ce.argmin()
             v_ce.append(result.v_ce.min())
-            tendon_force.append(result.tendon_force[-1])
+            tendon_force.append(result.tendon_force[index])
 
     return v_ce, tendon_force
 
@@ -479,11 +481,11 @@ def exercise1():
     pylog.info("Start exercise 1")
     time_param = TimeParameters(time_start=0.0, time_stop=0.2, time_step=0.001, time_stabilize=0.2)
 
-    # exercise1a(time_param)
-    # exercise1b(time_param)
-    # exercise1c(time_param)
+    exercise1a(time_param)
+    exercise1b(time_param)
+    exercise1c(time_param)
     time_param.t_stop = 0.3
-    # exercise1d(time_param)
+    exercise1d(time_param)
     exercise1e(time_param)
 
     if DEFAULT["save_figures"]:
