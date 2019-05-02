@@ -8,14 +8,25 @@ from robot_parameters import RobotParameters
 
 def network_ode(_time, state, parameters):
     """Network_ODE
-
+    
     returns derivative of state (phases and amplitudes)
 
     """
     phases = state[:parameters.n_oscillators]
     amplitudes = state[parameters.n_oscillators:2*parameters.n_oscillators]
-    return np.concatenate([np.zeros_like(phases), np.zeros_like(amplitudes)])
+    d_phases = np.zeros_like(phases)
+    d_amplitudes = np.zeros_like(amplitudes)
 
+    for i in range(parameters.n_oscillators):
+        # d_phase computation
+        d_phases[i] = 2*np.pi*parameters.freqs[i]
+        for j in range(parameters.n_oscillators):
+            d_phases[i] += amplitudes[j] * parameters.coupling_weights[i, j] *\
+                           np.sin(phases[j]-phases[i]-parameters.phase_bias[i, j])
+        # d_amplitude computation
+        d_amplitudes[i] = parameters.rates[i] * (parameters.nominal_amplitudes[i]-amplitudes[i])
+
+    return np.concatenate([d_phases, d_amplitudes])
 
 def motor_output(phases, amplitudes):
     """Motor output"""
