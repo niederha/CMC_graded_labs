@@ -8,12 +8,23 @@ from solvers import euler, rk4
 
 def phases_ode(time, phases, freqs, coupling_weights, phases_desired):
     """Network phases ODE"""
-    return np.zeros_like(phases)
+    dphases = np.zeros_like(phases)
+    r = np.ones_like(phases)
+    for i in range(0,len(phases)):
+        sum_j = 0
+        for j in range(0,len(phases)):
+            sum_j += r[j]*coupling_weights[i,j]*np.sin(phases[j]-phases[i]-phases_desired[i,j])
+        dphases[i] = 2*np.pi*freqs[i] + sum_j
+    
+    return dphases
 
 
 def amplitudes_ode(time, amplitudes, rate, amplitudes_desired):
     """Network amplitudes ODE"""
-    return np.zeros_like(amplitudes)
+    damplitudes =  np.zeros_like(amplitudes)
+    
+    damplitudes = rate*(amplitudes_desired-amplitudes)
+    return damplitudes
 
 
 def motor_output(phases_left, phases_right, amplitudes_left, amplitudes_right):
@@ -65,9 +76,19 @@ class PhaseEquation(ODESolver):
 
         # Set coupling weights
         pylog.warning("Coupling weights must be set")
-
+        weight = 10
+        b = np.ones(2*self.n_joints-1)
+        np.fill_diagonal(self.coupling_weights[1:], b)
+        np.fill_diagonal(self.coupling_weights[:,1:], b)
+        self.coupling_weights = self.coupling_weights*weight
+        print(self.coupling_weights)
+        
         # Set desired phases
-        pylog.warning("Desired phases must be set")
+        #pylog.warning("Desired phases must be set")
+        np.fill_diagonal(self.phases_desired[1:], b)
+        np.fill_diagonal(self.phases_desired[:,1:], -b)
+        self.phases_desired = self.phases_desired*phase_lag
+        print(self.phases_desired)
 
     def step(self):
         """Step"""
@@ -96,10 +117,11 @@ class AmplitudeEquation(ODESolver):
 
         # Set convergence rates
         pylog.warning("Convergence rates must be set")
-
+        self.rates = np.ones(2*self.n_joints)*5
         # Set desired amplitudes
         pylog.warning("Desired amplitudes must be set")
-
+        self.amplitudes_desired = np.ones(2*self.n_joints)*5
+        
     def step(self):
         """Step"""
         self.amplitudes += self.integrate(
