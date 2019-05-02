@@ -6,25 +6,41 @@ import cmc_pylog as pylog
 from solvers import euler, rk4
 
 
+
 def phases_ode(time, phases, freqs, coupling_weights, phases_desired):
     """Network phases ODE"""
-    return np.zeros_like(phases)
+    r=np.ones_like(phases)
+    summation=np.zeros(len(coupling_weights[:,0]))
+    dphases=[]
+    for i in range(0,len(coupling_weights[:,0])):
+        for j in range(0,len(coupling_weights[0,:])):
+            summation[i] = summation[i] + r[j]*coupling_weights[i,j]*np.sin(phases[j]-phases[i]-phases_desired[i,j])
+    
+        dphases.append(2*np.pi*freqs+summation[i])
+    return dphases
 
 
 def amplitudes_ode(time, amplitudes, rate, amplitudes_desired):
     """Network amplitudes ODE"""
-    return np.zeros_like(amplitudes)
+    dr=[]
+    r=np.ones_like(amplitudes)
+    for i in range(0,len(amplitudes)):
+        dr.append(rate*(amplitudes_desired[i]-r[i]))
+    return dr
 
 
 def motor_output(phases_left, phases_right, amplitudes_left, amplitudes_right):
     """Motor output"""
-    return np.zeros_like(amplitudes_left)
+    dangle=[]
+    for i in range(0,len(phases_left)):
+        dangle.append(amplitudes_left[i]*(1+np.cos(phases_left[i]))-amplitudes_right[i]*(1+np.cos(phases_right[i])))
+    return dangle
 
 
 class ODESolver(object):
     """ODE solver with step integration"""
 
-    def __init__(self, ode, timestep, solver=rk4):
+    def __init__(self, ode, timestep, solver=euler):
         super(ODESolver, self).__init__()
         self.ode = ode
         self.solver = solver
@@ -64,13 +80,20 @@ class PhaseEquation(ODESolver):
         """Set parameters of the network"""
 
         # Set coupling weights
-        pylog.warning("Coupling weights must be set")
+        self.coupling_weights=10*np.eye(self.n_joints, k=1)+np.eye(self.n_joints, k=-1)
+
 
         # Set desired phases
-        pylog.warning("Desired phases must be set")
+        self.phases_desired=2*np.pi/self.n_joints*(-np.eye(2*self.n_joints,k=-1)+
+                                              np.eye(2*self.n_joints,k=1)+
+                                              np.eye(2*self.n_joints,k=1+self.n_joints)-
+                                              np.eye(2*self.n_joints,k=-1+self.n_joints)+
+                                              np.eye(2*self.n_joints,k=-1-self.n_joints)-
+                                              np.eye(2*self.n_joints,k=1-self.n_joints))
 
     def step(self):
         """Step"""
+        
         self.phases += self.integrate(
             self.phases,
             self.freqs,
@@ -95,14 +118,14 @@ class AmplitudeEquation(ODESolver):
         """Set parameters of the network"""
 
         # Set convergence rates
-        pylog.warning("Convergence rates must be set")
+        self.rate=5
 
         # Set desired amplitudes
-        pylog.warning("Desired amplitudes must be set")
+        self.amplitude_desired=np.ones(len(amplitudes)) # fill with ones
 
     def step(self):
         """Step"""
-        self.amplitudes += self.integrate(
+        self.amplitudes +=  self.integrate(
             self.amplitudes,
             self.rates,
             self.amplitudes_desired
