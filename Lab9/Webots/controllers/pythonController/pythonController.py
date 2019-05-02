@@ -24,7 +24,7 @@ def main():
 
     # Simulation arguments
     arguments = world.getControllerArguments()
-    pylog.info("Arguments passed to smulation: {}".format(arguments))
+    pylog.info("Arguments passed to simulation: {}".format(arguments))
 
     # Exercise example to show how to run a grid search
     if "example" in arguments:
@@ -57,7 +57,7 @@ def main():
     # Pause
     world.simulationSetMode(world.SIMULATION_MODE_PAUSE)
     pylog.info("Simulations complete")
-    world.simulationQuit(0)
+    # world.simulationQuit(0)
 
 
 if __name__ == '__main__':
