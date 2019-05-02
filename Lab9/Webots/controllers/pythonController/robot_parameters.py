@@ -44,7 +44,24 @@ class RobotParameters(dict):
 
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
-        pylog.warning("Coupling weights must be set")
+        weak_coupling = 10.
+        strong_coupling = 30.
+
+
+        # Couple body oscillators
+        for i in range(self.n_oscillators_body):
+            # Neighbour coupling
+            if i != (self.n_oscillators_body/2)-1:
+                self.coupling_weights[i][i+1] = weak_coupling
+                self.coupling_weights[i+1][i] = weak_coupling
+            # Anti-phase coupling
+            if i < self.n_oscillators_body:
+                self.coupling_weights[i][i+self.n_oscillators_body/2] = weak_coupling
+                self.coupling_weights[i + self.n_oscillators_body / 2][i] = weak_coupling
+
+        # Limb coupling
+        for i in range(self.n_oscillators_legs):
+
 
     def set_phase_bias(self, parameters):
         """Set phase bias"""
