@@ -74,7 +74,7 @@ def run_network(duration, update=False, drive=0):
 
     # Implement plots of network results
     pylog.warning("Implement plots")
-
+    plt.plot(times,outputs_log[:,1])
 
 def main(plot):
     """Main"""
