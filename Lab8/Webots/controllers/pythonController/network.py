@@ -9,6 +9,7 @@ from solvers import euler, rk4
 
 def phases_ode(time, phases, freqs, coupling_weights, phases_desired):
     """Network phases ODE"""
+<<<<<<< HEAD
     r=np.ones_like(phases)
     summation=np.zeros(len(coupling_weights[:,0]))
     dphases=[]
@@ -17,16 +18,33 @@ def phases_ode(time, phases, freqs, coupling_weights, phases_desired):
             summation[i] = summation[i] + r[j]*coupling_weights[i,j]*np.sin(phases[j]-phases[i]-phases_desired[i,j])
     
         dphases.append(2*np.pi*freqs+summation[i])
+=======
+    dphases = np.zeros_like(phases)
+    r = np.ones_like(phases)
+    for i in range(0,len(phases)):
+        sum_j = 0
+        for j in range(0,len(phases)):
+            sum_j += r[j]*coupling_weights[i,j]*np.sin(phases[j]-phases[i]-phases_desired[i,j])
+        dphases[i] = 2*np.pi*freqs[i] + sum_j
+    
+>>>>>>> 6514473522f651ec974345826c88db261a41aaf0
     return dphases
 
 
 def amplitudes_ode(time, amplitudes, rate, amplitudes_desired):
     """Network amplitudes ODE"""
+<<<<<<< HEAD
     dr=[]
     r=np.ones_like(amplitudes)
     for i in range(0,len(amplitudes)):
         dr.append(rate*(amplitudes_desired[i]-r[i]))
     return dr
+=======
+    damplitudes =  np.zeros_like(amplitudes)
+    
+    damplitudes = rate*(amplitudes_desired-amplitudes)
+    return damplitudes
+>>>>>>> 6514473522f651ec974345826c88db261a41aaf0
 
 
 def motor_output(phases_left, phases_right, amplitudes_left, amplitudes_right):
@@ -80,6 +98,7 @@ class PhaseEquation(ODESolver):
         """Set parameters of the network"""
 
         # Set coupling weights
+
         self.coupling_weights=10*np.eye(self.n_joints, k=1)+np.eye(self.n_joints, k=-1)
 
 
@@ -90,6 +109,7 @@ class PhaseEquation(ODESolver):
                                               np.eye(2*self.n_joints,k=-1+self.n_joints)+
                                               np.eye(2*self.n_joints,k=-1-self.n_joints)-
                                               np.eye(2*self.n_joints,k=1-self.n_joints))
+
 
     def step(self):
         """Step"""
@@ -118,10 +138,12 @@ class AmplitudeEquation(ODESolver):
         """Set parameters of the network"""
 
         # Set convergence rates
+
         self.rate=5
 
         # Set desired amplitudes
         self.amplitude_desired=np.ones(len(amplitudes)) # fill with ones
+
 
     def step(self):
         """Step"""
