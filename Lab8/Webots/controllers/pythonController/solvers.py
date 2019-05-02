@@ -1,9 +1,12 @@
 """ODE solvers using dixed step integration"""
 
 
+import numpy as np
+
 def euler(ode, timestep, time, state, *parameters):
     """ODE solver with euler method"""
-    return timestep*ode(time, state, *parameters)
+
+    return timestep*np.asarray(ode(time, state, *parameters))
 
 
 def rk4(ode, timestep, time, state, *parameters):
