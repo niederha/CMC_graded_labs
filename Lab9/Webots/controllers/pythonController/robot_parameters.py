@@ -40,7 +40,13 @@ class RobotParameters(dict):
 
     def set_frequencies(self, parameters):
         """Set frequencies"""
-        pylog.warning("Coupling weights must be set")
+        self.freqs = np.zeros(self.n_oscillators)
+        
+        self.freqs[:self.n_oscillators_body]=1
+        self.freqs[self.n_oscillators_body:]=0.3 #according to additional page 2
+        
+        
+        #pylog.warning("Coupling weights must be set")
 
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
@@ -89,9 +95,14 @@ class RobotParameters(dict):
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
-        pylog.warning("Convergence rates must be set")
+        self.rates = 20*np.ones(self.n_oscillators) #according to additional material table s1
+        
+        #pylog.warning("Convergence rates must be set")
 
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
-        pylog.warning("Nominal amplitudes must be set")
+        
+        self.nominal_amplitudes = np.ones(self.n_oscillators)
+        
+        #pylog.warning("Nominal amplitudes must be set")
 
