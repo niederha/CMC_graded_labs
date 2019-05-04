@@ -44,11 +44,48 @@ class RobotParameters(dict):
 
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
-        pylog.warning("Coupling weights must be set")
+        self.coupling_weights = np.zeros([self.n_oscillators, self.n_oscillators])
+        
+        body_weight = 10
+        leg_weight = 30
+        
+        # Coupling weights between body joints left side
+        self.coupling_weights[:self.n_body_joints,:self.n_body_joints]=(body_weight*np.eye(self.n_body_joints,k=-1)+body_weight*np.eye(self.n_body_joints,k=1))
+        # Coupling weights between body joints right side
+        self.coupling_weights[self.n_body_joints:self.n_oscillators_body,self.n_body_joints:self.n_oscillators_body]=(body_weight*np.eye(self.n_body_joints,k=-1)+body_weight*np.eye(self.n_body_joints,k=1))
+        # Coupling weights between body joints between left and right side
+        self.coupling_weights[:self.n_oscillators_body,:self.n_oscillators_body]+=body_weight*np.eye(self.n_oscillators_body,k=-self.n_body_joints)+body_weight*np.eye(self.n_oscillators_body,k=self.n_body_joints)
+        
+        # Coupling weights between leg joints
+        self.coupling_weights[self.n_oscillators_body:self.n_oscillators,self.n_oscillators_body:self.n_oscillators]=body_weight*np.array([[0,1,1,0],[1,0,0,1],[1,0,0,1],[0,1,1,0]])
+        
+        # Coupling weights from front left leg to body
+        self.coupling_weights[self.n_oscillators_body,:int(self.n_body_joints/2)]=leg_weight*np.ones([1,int(self.n_body_joints/2)])
+        # Coupling weights from front right leg to body
+        self.coupling_weights[self.n_oscillators_body+1,self.n_body_joints:3*int(self.n_body_joints/2)]=leg_weight*np.ones([1,int(self.n_body_joints/2)])      
+         # Coupling weights from back left leg to body
+        self.coupling_weights[self.n_oscillators_body+2,int(self.n_body_joints/2):self.n_body_joints]=leg_weight*np.ones([1,int(self.n_body_joints/2)])          
+        # Coupling weights from back left leg to body
+        self.coupling_weights[self.n_oscillators_body+3,3*int(self.n_body_joints/2):2*self.n_body_joints]=leg_weight*np.ones([1,int(self.n_body_joints/2)])        
+        #pylog.warning("Coupling weights must be set")
 
     def set_phase_bias(self, parameters):
         """Set phase bias"""
-        pylog.warning("Phase bias must be set")
+        self.phase_bias = np.zeros([self.n_oscillators, self.n_oscillators])
+        
+        # Phase bias between body joints left side
+        self.phase_bias[:self.n_body_joints,:self.n_body_joints]=(-2*np.pi/self.n_body_joints*np.eye(self.n_body_joints,k=-1)+2*np.pi/self.n_body_joints*np.eye(self.n_body_joints,k=1))
+        # Phase bias between body joints right side
+        self.phase_bias[self.n_body_joints:self.n_oscillators_body,self.n_body_joints:self.n_oscillators_body]=(-2*np.pi/self.n_body_joints*np.eye(self.n_body_joints,k=-1)+2*np.pi/self.n_body_joints*np.eye(self.n_body_joints,k=1))
+        # Phase bias between body joints between left and right side
+        self.phase_bias[:self.n_oscillators_body,:self.n_oscillators_body]+=np.pi*np.eye(self.n_oscillators_body,k=-self.n_body_joints)+np.pi*np.eye(self.n_oscillators_body,k=self.n_body_joints)
+        
+        # Phase bias between front leg joints
+        self.phase_bias[self.n_oscillators_body:self.n_oscillators-2,self.n_oscillators_body:self.n_oscillators-2]=[[0,np.pi],[np.pi,0]]
+        
+        # Phase bias between back leg joints
+        self.phase_bias[self.n_oscillators_body+2:self.n_oscillators,self.n_oscillators_body+2:self.n_oscillators]=[[0,np.pi],[np.pi,0]]
+        #pylog.warning("Phase bias must be set")
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""

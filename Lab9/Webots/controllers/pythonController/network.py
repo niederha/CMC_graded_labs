@@ -12,14 +12,35 @@ def network_ode(_time, state, parameters):
     returns derivative of state (phases and amplitudes)
 
     """
+    
     phases = state[:parameters.n_oscillators]
     amplitudes = state[parameters.n_oscillators:2*parameters.n_oscillators]
-    return np.concatenate([np.zeros_like(phases), np.zeros_like(amplitudes)])
+    
+    summation=0
+    dphases=[]
+    damplitudes=[]
+    
+    for i in range(0,parameters.n_oscillators):
+        for j in range(0,parameters.n_oscillators):
+            summation += amplitudes[j]*parameters.coupling_weights[i,j]*np.sin(phases[j]-phases[i]-parameters.phase_bias[i,j])
+    
+        np.append(dphases,2*np.pi*parameters.freqs[i]+summation)
+        np.append(damplitudes,parameters.rates*(parameters.nominal_amplitudes[i]-amplitudes[i]))  
+
+    return np.concatenate([dphases, damplitudes])
 
 
 def motor_output(phases, amplitudes):
     """Motor output"""
-    return np.zeros_like(phases) + np.zeros_like(amplitudes)
+    
+    angles=[]
+    
+    for i in range(0,int(len(phases)/2)):
+        np.append(angles, amplitudes[i]*(1+np.cos(phases[i]))-amplitudes[i+10]*(1+np.cos(phases[i+10])))
+    
+    return(angles)
+    
+    #return np.zeros_like(phases) + np.zeros_like(amplitudes)
 
 
 class ODESolver(object):
