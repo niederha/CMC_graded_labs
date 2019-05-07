@@ -16,31 +16,29 @@ def network_ode(_time, state, parameters):
     phases = state[:parameters.n_oscillators]
     amplitudes = state[parameters.n_oscillators:2*parameters.n_oscillators]
     
-    summation=0
-    dphases=[]
-    damplitudes=[]
+    dphases = np.zeros_like(phases)
+    damplitudes = np.zeros_like(phases)
     
     for i in range(0,parameters.n_oscillators):
         for j in range(0,parameters.n_oscillators):
-            summation += amplitudes[j]*parameters.coupling_weights[i,j]*np.sin(phases[j]-phases[i]-parameters.phase_bias[i,j])
-    
-        np.append(dphases,2*np.pi*parameters.freqs[i]+summation)
-        np.append(damplitudes,parameters.rates*(parameters.nominal_amplitudes[i]-amplitudes[i]))  
-
+            phases[i] += amplitudes[j]*parameters.coupling_weights[i,j]*np.sin(phases[j]-phases[i]-parameters.phase_bias[i,j])    
+        
+        phases[i] += 2*np.pi*parameters.freqs[i]            
+        damplitudes[i] = parameters.rates[i]*(parameters.nominal_amplitudes[i]-amplitudes[i])
+          
     return np.concatenate([dphases, damplitudes])
 
 
 def motor_output(phases, amplitudes):
     """Motor output"""
-    
-    angles=[]
-    
-    for i in range(0,int(len(phases)/2)):
-        np.append(angles, amplitudes[i]*(1+np.cos(phases[i]))-amplitudes[i+10]*(1+np.cos(phases[i+10])))
-    
-    return(angles)
-    
-    #return np.zeros_like(phases) + np.zeros_like(amplitudes)
+    motors_len = 10
+    dmotor = np.zeros(motors_len+4)
+    #print(phases)
+    #print(amplitudes)
+    for i in range(0,motors_len):
+        dmotor[i] = amplitudes[i]*(1+np.cos(phases[i]))-amplitudes[i+motors_len]*(1+np.cos(phases[i+motors_len]))  
+    #print(dmotor)
+    return dmotor
 
 
 class ODESolver(object):
@@ -108,16 +106,17 @@ class SalamanderNetwork(ODESolver):
         super(SalamanderNetwork, self).__init__(
             ode=network_ode,
             timestep=timestep,
-            solver=rk4  # Feel free to switch between Euler (euler) or
+            solver=euler  # Feel free to switch between Euler (euler) or
                         # Runge-Kutta (rk4) integration methods
         )
         # States
         self.state = RobotState.salamandra_robotica_2()
         # Parameters
         self.parameters = RobotParameters(parameters)
+        
         # Set initial state
         self.state.phases = 1e-4*np.random.ranf(self.parameters.n_oscillators)
-
+        
     def step(self):
         """Step"""
         self.state += self.integrate(self.state, self.parameters)
