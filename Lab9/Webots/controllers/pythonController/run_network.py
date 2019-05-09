@@ -73,9 +73,30 @@ def run_network(duration, update=False, drive=0):
     ))
 
     # Implement plots of network results
-    pylog.warning("Implement plots")
+
+    plt.figure(1)
+    plt.subplot(221)
+    for i in range(0,len(outputs_log[0,:])):
+        plt.plot(times,outputs_log[:,i])
+    plt.title("Motor Position")
+  
+    plt.subplot(222)
+    for i in range(0,len(freqs_log[0,:])):
+        plt.plot(times,freqs_log[:,i])
+    plt.title("Frequencies")
+
+    plt.subplot(223)
+    for i in range(0,len(amplitudes_log[0,:])):
+        plt.plot(times,amplitudes_log[:,i])
+    plt.title("Amplitudes")
 
 
+    plt.subplot(224)
+    for i in range(0,len(phases_log[0,:])):
+        plt.plot(times,phases_log[:,i])
+    plt.title("Phases")
+    plt.show()
+    
 def main(plot):
     """Main"""
 

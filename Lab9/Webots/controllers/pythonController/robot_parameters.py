@@ -2,7 +2,8 @@
 
 import numpy as np
 import cmc_pylog as pylog
-
+from numpy import genfromtxt
+import platform
 
 class RobotParameters(dict):
     """Robot parameters"""
@@ -40,21 +41,119 @@ class RobotParameters(dict):
 
     def set_frequencies(self, parameters):
         """Set frequencies"""
-        pylog.warning("Coupling weights must be set")
+        #pylog.warning("Frequencies must be set")
 
+        #self.freqs = np.ones(self.n_oscillators)*0.01
+        self.freqs[:self.n_oscillators_body]=1
+        self.freqs[self.n_oscillators_body:]=0.3 #according to additional page 2
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
-        pylog.warning("Coupling weights must be set")
-
+        #pylog.warning("Coupling weights must be set")
+        
+        """
+        travelingWave = 10
+        legInPhase = 30
+        legAntiPhase = 10
+        
+#        travelingWave = 1
+#        legInPhase = 2
+#        legAntiPhase = 3
+        
+        
+        size = int(self.n_oscillators_body/2)
+        #size = 6
+        
+        self.coupling_weights = np.zeros([self.n_oscillators,self.n_oscillators])
+        #parameters.phase_bias = np.zeros([size*3,size*3])
+        self.coupling_weights[:2*size,:2*size] = travelingWave*(    np.eye(2*size,k=-1) 
+                                                                        + np.eye(2*size,k=1)     
+                                                                        + np.eye(2*size,k=size) 
+                                                                        + np.eye(2*size,k=-size))
+        
+        self.coupling_weights[int(size*2),:int(size/2)] = legInPhase
+        self.coupling_weights[int(size*2),int(size*2)+1] = legAntiPhase
+        self.coupling_weights[int(size*2),int(size*2)+2] = legAntiPhase
+        
+        self.coupling_weights[int(size*2)+1,size:int(3*size/2)] = legInPhase
+        self.coupling_weights[int(size*2)+1,int(size*2)] = legAntiPhase
+        self.coupling_weights[int(size*2)+1,int(size*2)+3] = legAntiPhase
+        
+        self.coupling_weights[int(size*2)+2,int(size/2):size] = legInPhase
+        self.coupling_weights[int(size*2)+2,int(size*2)] = legAntiPhase
+        self.coupling_weights[int(size*2)+2,int(size*2)+3] = legAntiPhase
+        
+        self.coupling_weights[int(size*2)+3,int(3*size/2):int(2*size)] = legInPhase
+        self.coupling_weights[int(size*2)+3,int(size*2)+1] = legAntiPhase
+        self.coupling_weights[int(size*2)+3,int(size*2)+2] = legAntiPhase
+     
+#        for x in parameters.coupling_weights:
+#            print(*x, sep="   ")
+#        print(parameters.phase_bias.shape)
+        """
+        if(platform.system() == 'Linux'):
+            self.coupling_weights = genfromtxt('Arrays/Coupling_Weights.csv', delimiter=',')
+        else:
+            self.coupling_weights = genfromtxt('Arrays\\Coupling_Weights.csv', delimiter=';')
+        
     def set_phase_bias(self, parameters):
         """Set phase bias"""
-        pylog.warning("Phase bias must be set")
+        #pylog.warning("Phase bias must be set")
+        """
+        travelingWave = 2*np.pi/self.n_joints
+        legInPhase = 0
+        legAntiPhase = np.pi
+        
+#        travelingWave = 1
+#        legInPhase = 2
+#        legAntiPhase = 3
+        
+        
+        size = int(self.n_oscillators_body/2)
+        #size = 6
+        
+        self.phase_bias = np.zeros([self.n_oscillators,self.n_oscillators])
+        #parameters.phase_bias = np.zeros([size*3,size*3])
+        self.phase_bias[:2*size,:2*size] = ( - travelingWave*np.eye(2*size,k=-1) 
+                                + travelingWave*np.eye(2*size,k=1)        
+                                + legAntiPhase* np.eye(2*size,k=size)   
+                                + legAntiPhase* np.eye(2*size,k=-size))
+        
+        self.phase_bias[int(size*2),:int(size/2)] = legInPhase
+        self.phase_bias[int(size*2),int(size*2)+1] = legAntiPhase
+        self.phase_bias[int(size*2),int(size*2)+2] = legAntiPhase
+        
+        self.phase_bias[int(size*2)+1,size:int(3*size/2)] = legInPhase
+        self.phase_bias[int(size*2)+1,int(size*2)] = -legAntiPhase*(-1)
+        self.phase_bias[int(size*2)+1,int(size*2)+3] = -legAntiPhase*(-1)
+        
+        self.phase_bias[int(size*2)+2,int(size/2):size] = legInPhase
+        self.phase_bias[int(size*2)+2,int(size*2)] = -legAntiPhase*(-1)
+        self.phase_bias[int(size*2)+2,int(size*2)+3] = -legAntiPhase*(-1)
+        
+        self.phase_bias[int(size*2)+3,int(3*size/2):int(2*size)] = legInPhase
+        self.phase_bias[int(size*2)+3,int(size*2)+1] = legAntiPhase
+        self.phase_bias[int(size*2)+3,int(size*2)+2] = legAntiPhase
+
+    
+        """     
+        if(platform.system() == 'Linux'):
+            self.phase_bias = genfromtxt('Arrays/Phase_Shifts.csv', delimiter=',')
+        else:
+            self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')
+        #self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')  
+        
+
+#        for x in parameters.phase_bias:
+#            print(*x, sep="   ")
+#        print(parameters.phase_bias.shape)
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
-        pylog.warning("Convergence rates must be set")
+        #pylog.warning("Convergence rates must be set")
+        self.rates = np.ones(self.n_oscillators)*20
 
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
-        pylog.warning("Nominal amplitudes must be set")
+        #pylog.warning("Nominal amplitudes must be set")
+        self.nominal_amplitudes = np.ones(self.n_oscillators)*np.pi/8
 
