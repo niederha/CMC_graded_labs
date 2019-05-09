@@ -39,6 +39,8 @@ def motor_output(phases, amplitudes):
     for i in range(0,motors_len):
         dmotor[i] = amplitudes[i]*(1+np.cos(phases[i]))-amplitudes[i+motors_len]*(1+np.cos(phases[i+motors_len]))  
     #print(dmotor)
+    for i in range(motors_len, len(dmotor)):
+        dmotor[i]= phases[i+20]
     return dmotor
 
 
