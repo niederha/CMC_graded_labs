@@ -20,10 +20,11 @@ def network_ode(_time, state, parameters):
     damplitudes = np.zeros_like(phases)
     
     for i in range(0,parameters.n_oscillators):
+        summation = 0
         for j in range(0,parameters.n_oscillators):
-            phases[i] += amplitudes[j]*parameters.coupling_weights[i,j]*np.sin(phases[j]-phases[i]-parameters.phase_bias[i,j])    
+            dphases[i] += amplitudes[j]*parameters.coupling_weights[i,j]*np.sin(phases[j]-phases[i]-parameters.phase_bias[i,j])    
         
-        phases[i] += 2*np.pi*parameters.freqs[i]            
+        dphases[i] += 2*np.pi*parameters.freqs[i]            
         damplitudes[i] = parameters.rates[i]*(parameters.nominal_amplitudes[i]-amplitudes[i])
           
     return np.concatenate([dphases, damplitudes])
@@ -106,7 +107,7 @@ class SalamanderNetwork(ODESolver):
         super(SalamanderNetwork, self).__init__(
             ode=network_ode,
             timestep=timestep,
-            solver=rk4  # Feel free to switch between Euler (euler) or
+            solver=euler  # Feel free to switch between Euler (euler) or
                         # Runge-Kutta (rk4) integration methods
         )
         # States
