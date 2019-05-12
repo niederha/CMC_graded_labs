@@ -44,8 +44,17 @@ class RobotParameters(dict):
         #pylog.warning("Frequencies must be set")
 
         #self.freqs = np.ones(self.n_oscillators)*0.01
-        self.freqs[:self.n_oscillators_body]=1
-        self.freqs[self.n_oscillators_body:]=0.3 #according to additional page 2
+        if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
+            self.freqs[:self.n_oscillators_body]= parameters.cf1Body*parameters.drive+parameters.cf0Body
+        else:
+            self.freqs[:self.n_oscillators_body]= parameters.fsatBody
+        
+        if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
+            self.freqs[self.n_oscillators_body:]= parameters.cf1Limb*parameters.drive+parameters.cf0Limb
+        else:
+            self.freqs[self.n_oscillators_body:]= parameters.fsatLimb
+        
+            
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
         #pylog.warning("Coupling weights must be set")
@@ -155,5 +164,15 @@ class RobotParameters(dict):
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
         #pylog.warning("Nominal amplitudes must be set")
-        self.nominal_amplitudes = np.ones(self.n_oscillators)*np.pi/8
-
+        #self.nominal_amplitudes = np.ones(self.n_oscillators)*np.pi/8
+        
+        if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
+            self.nominal_amplitudes[:self.n_oscillators_body]= parameters.cR1Body*parameters.drive+parameters.cR0Body
+        else:
+            self.nominal_amplitudes[:self.n_oscillators_body]= parameters.RsatBody
+        
+        if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
+            self.nominal_amplitudes[self.n_oscillators_body:]= parameters.cR1Limb*parameters.drive+parameters.cR0Limb
+        else:
+            self.nominal_amplitudes[self.n_oscillators_body:]= parameters.RsatLimb
+        
