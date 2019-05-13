@@ -13,11 +13,14 @@ def exercise_9b(world, timestep, reset):
             simulation_duration=10,
             drive=drive,
             amplitudes=[1, 2, 3],
+            RHead = 1,
+            RTail = 1,
+            Backwards = False,
             phase_lag=np.zeros(n_joints),
-            turn=0,
+            turnRate=[1,1],
             # ...
         )
-        for drive in np.linspace(2, 6, 2)
+        for drive in np.linspace(4,5, 2)
         # for amplitudes in ...
         # for ...
     ]

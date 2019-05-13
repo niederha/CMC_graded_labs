@@ -12,14 +12,14 @@ def exercise_9g(world, timestep, reset):
     n_joints = 10
     parameter_set = [
         SimulationParameters(
-            simulation_duration=10,
+            simulation_duration=20,
             drive=drive,
             amplitudes=[1, 2, 3],
             phase_lag=np.zeros(n_joints),
             turn=0,
             # ...
         )
-        for drive in np.linspace(2, 5, 2)
+        for drive in np.linspace(1, 5, 2)
         # for amplitudes in ...
         # for ...
     ]

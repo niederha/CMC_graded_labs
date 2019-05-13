@@ -16,7 +16,6 @@ class SalamanderCMC(object):
         self.robot = robot
         timestep = int(robot.getBasicTimeStep())
         self.network = SalamanderNetwork(1e-3*timestep, parameters)
-
         # Position sensors
         self.position_sensors = [
             self.robot.getPositionSensor('position_sensor_{}'.format(i+1))
@@ -59,9 +58,16 @@ class SalamanderCMC(object):
             timestep=1e-3*timestep,
             **parameters
         )
-
+        
+        #GPS stuff
+        self.waterPosx = 0
+        self.onGround = True
+        self.NetworkParameters = self.network.parameters
+        self.SimulationParameters = parameters
+                
     def log_iteration(self):
         """Log state"""
+        
         self.log.log_link_positions(self.iteration, 0, self.gps.getValues())
         for i, motor in enumerate(self.motors_body):
             # Position
@@ -106,7 +112,29 @@ class SalamanderCMC(object):
             self.motors_legs[i].setPosition(
                 positions[self.N_BODY_JOINTS+i] - np.pi/2
             )
+        
+        gpsPos = self.gps.getValues()
 
+        if self.onGround:
+            if gpsPos[0] > self.waterPosx:
+                
+                self.SimulationParameters.drive += (gpsPos[0]-self.waterPosx-0.3)*0.2
+                if self.SimulationParameters.drive > 3:
+                    self.onGround = False
+                    print('Transition to water')
+                
+                self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+                self.NetworkParameters.set_frequencies(self.SimulationParameters)
+        else:
+            if gpsPos[0] < self.waterPosx-0.1:
+                self.onGround = True
+                self.SimulationParameters.drive -= (gpsPos[0]+0.1+self.waterPosx)*0.2
+                if self.SimulationParameters.drive < 3:
+                    self.onGround = True
+                    print('Transition to ground')
+                
+                self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+                self.NetworkParameters.set_frequencies(self.SimulationParameters)
         # Log data
         self.log_iteration()
 

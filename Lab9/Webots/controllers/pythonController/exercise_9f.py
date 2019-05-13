@@ -11,7 +11,7 @@ def exercise_9f(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,
-            drive=1.1,
+            drive=3,
             amplitudes=[1, 2, 3],
             phase_lag=np.zeros(n_joints),
             turn=0,

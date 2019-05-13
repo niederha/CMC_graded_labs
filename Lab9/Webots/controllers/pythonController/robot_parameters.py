@@ -103,7 +103,7 @@ class RobotParameters(dict):
             self.coupling_weights = genfromtxt('Arrays/Coupling_Weights.csv', delimiter=',')
         else:
             self.coupling_weights = genfromtxt('Arrays\\Coupling_Weights.csv', delimiter=';')
-        
+
     def set_phase_bias(self, parameters):
         """Set phase bias"""
         #pylog.warning("Phase bias must be set")
@@ -150,7 +150,8 @@ class RobotParameters(dict):
         else:
             self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')
         #self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')  
-        
+        if parameters.Backwards:
+            self.phase_bias *= -1 
 
 #        for x in parameters.phase_bias:
 #            print(*x, sep="   ")
@@ -176,3 +177,9 @@ class RobotParameters(dict):
         else:
             self.nominal_amplitudes[self.n_oscillators_body:]= parameters.RsatLimb
         
+        gradient = np.ones(self.n_oscillators)   
+        bodylength = self.n_body_joints
+        gradient[:self.n_body_joints] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[0]
+        gradient[self.n_body_joints:self.n_oscillators_body] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[1]      
+        self.nominal_amplitudes *= gradient 
+

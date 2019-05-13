@@ -37,6 +37,13 @@ class SimulationParameters(dict):
         self.fsatLimb = 0.0
         self.RsatBody = 0.0
         self.RsatLimb =0.0
+        
+        self.RHead = 1
+        self.RTail = 1
+        
+        self.Backwards = False
+        
+        self.turnRate = [1,1]
         # Update object with provided keyword arguments
         self.update(kwargs)  # NOTE: This overrides the previous declarations
 
