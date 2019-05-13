@@ -3,7 +3,7 @@
 import numpy as np
 from network import SalamanderNetwork
 from experiment_logger import ExperimentLogger
-
+from controller import Keyboard
 
 class SalamanderCMC(object):
     """Salamander robot for CMC"""
@@ -61,9 +61,11 @@ class SalamanderCMC(object):
         
         #GPS stuff
         self.waterPosx = 0
-        self.onGround = True
         self.NetworkParameters = self.network.parameters
         self.SimulationParameters = parameters
+        self.keyboard = Keyboard()
+        self.keyboard.enable(samplingPeriod=100)
+        self.lastkey = 0
                 
     def log_iteration(self):
         """Log state"""
@@ -112,29 +114,34 @@ class SalamanderCMC(object):
             self.motors_legs[i].setPosition(
                 positions[self.N_BODY_JOINTS+i] - np.pi/2
             )
-        
-        gpsPos = self.gps.getValues()
 
-        if self.onGround:
-            if gpsPos[0] > self.waterPosx:
-                
-                self.SimulationParameters.drive += (gpsPos[0]-self.waterPosx-0.3)*0.2
-                if self.SimulationParameters.drive > 3:
-                    self.onGround = False
-                    print('Transition to water')
-                
-                self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
-                self.NetworkParameters.set_frequencies(self.SimulationParameters)
-        else:
-            if gpsPos[0] < self.waterPosx-0.1:
-                self.onGround = True
-                self.SimulationParameters.drive -= (gpsPos[0]+0.1+self.waterPosx)*0.2
-                if self.SimulationParameters.drive < 3:
-                    self.onGround = True
-                    print('Transition to ground')
-                
-                self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
-                self.NetworkParameters.set_frequencies(self.SimulationParameters)
+
+        key=self.keyboard.getKey()
+        if (key==ord('A') and key is not self.lastkey):
+            print('a pressed')
+            self.SimulationParameters.turnRate = [0.5,1]
+            self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+            self.lastkey = key
+        if (key==ord('D') and key is not self.lastkey):
+            print('d pressed')
+            self.SimulationParameters.turnRate = [1,0.5]
+            self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+            self.lastkey = key
+        if (key==ord('W') and key is not self.lastkey):
+            print('w pressed')
+            self.SimulationParameters.turnRate = [1,1]
+            self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+            self.lastkey = key
+        gpsPos = self.gps.getValues()
+        
+        if gpsPos[0] < self.waterPosx+2 and gpsPos[0] > self.waterPosx -0.5:
+            gain = 4/2.5*(gpsPos[0]+0.5) + 1
+            self.SimulationParameters.drive = gain
+            #print('Transitioning')
+            
+            self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+            self.NetworkParameters.set_frequencies(self.SimulationParameters)
+
         # Log data
         self.log_iteration()
 
