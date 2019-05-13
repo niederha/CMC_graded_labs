@@ -43,7 +43,7 @@ def motor_output(phases, amplitudes):
             
             dmotor[i] = 0
         else:
-            dmotor[i] = phases[motors_len+i]
+            dmotor[i] = -phases[motors_len+i]
             
     
     return dmotor

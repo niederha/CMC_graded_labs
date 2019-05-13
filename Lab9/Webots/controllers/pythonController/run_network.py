@@ -10,7 +10,7 @@ from parse_args import save_plots
 from simulation_parameters import SimulationParameters
 
 
-def run_network(duration, update=False, drive=5):
+def run_network(duration, update=False, drive=1):
     """Run network without Webots and plot results"""
     # Simulation setup
     timestep = 5e-3
