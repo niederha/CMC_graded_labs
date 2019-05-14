@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D  # Module for 3D plots
 from matplotlib import cm  # Module for color maps
 
 
-def plot_body_joints(time, joint_angles, variable='body joint angle'):
+def plot_body_joints(time, joint_angles, variable='body joint angle',title='Spine angle evolution'):
     """ Extracts and plots motor output for body joints"""
     nb_legs = 4
     nb_body = joint_angles.shape[1]-nb_legs
@@ -23,7 +23,7 @@ def plot_body_joints(time, joint_angles, variable='body joint angle'):
                  label="body joint " + str(body_joint_index))
     plt.grid()
     plt.legend()
-    plt.title(variable + " evolution")
+    plt.title(title)
 
 
 def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
@@ -80,23 +80,16 @@ def plot_positions(times, link_data):
     plt.ylabel("Distance [m]")
     plt.grid(True)
     
-def plot_velocity_link(times, velocity):
+
+def plot_trajectory(link_data,label):
     """Plot positions"""
-    for i, data in enumerate(velocity.T):
-        plt.plot(times[25:], data[25:], label=["vx", "vy", "vz"][i])
+    plt.plot(link_data[:, 0], link_data[:, 2], label=label)
     plt.legend()
-    plt.xlabel("Time [s]")
-    plt.ylabel("Velocity [m/s]")
-    plt.grid(True)
-
-
-def plot_trajectory(link_data):
-    """Plot positions"""
-    plt.plot(link_data[:, 0], link_data[:, 2])
     plt.xlabel("x [m]")
     plt.ylabel("z [m]")
     plt.axis("equal")
     plt.grid(True)
+    plt.title('GPS trajectory '+ label)
 
 
 def plot_2d(results, labels, n_data=300, log=False, cmap=None):
@@ -157,12 +150,12 @@ def exercise_9c_plots():
             joints_data = data["joints"]
             rhead = data["RHead"]
             rtail = data["RTail"]
-        times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+        #times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
 
 
         pos = link_data
         vel = np.diff(pos, axis=0, prepend=0)/ timestep
-        print(np.mean(vel,axis = 0))
+
         link_vel_list.append(np.linalg.norm(np.mean(vel,axis = 0)))        
         
         rhead_list.append(rhead)
@@ -193,20 +186,19 @@ def exercise_9c_plots():
     ax.plot_surface(X,Y, Z, cmap=cm.coolwarm)
     ax.set_xlabel('RHead')
     ax.set_ylabel('RTail')
-    ax.set_zlabel('Velocity')
+    ax.set_zlabel('Velocity [m/s]')
     
     """Plot the energy graph"""
     
     torque = np.array(joint_torque_list)
     velocity = np.array(joint_vel_list)
-    print(torque.shape)
-    print(velocity.shape)
+
     energy = torque*velocity*timestep
-    print(energy.shape)
+
     energy = np.sum(energy,axis = 1)
-    print(energy.shape)
+
     energy = np.sum(energy,axis = 1)
-    print(energy.shape)
+
     
     fig = plt.figure("exercise_9c_energy_plot")
     ax = fig.add_subplot(111, projection='3d')
@@ -225,13 +217,57 @@ def exercise_9c_plots():
     ax.plot_surface(X,Y, Z, cmap=cm.coolwarm)
     ax.set_xlabel('RHead')
     ax.set_ylabel('RTail')
-    ax.set_zlabel('Energy')
+    ax.set_zlabel('Energy [J]')
+    
+def exercise_9d1_plots():
+    
+    with np.load('logs/exercise_9d1/simulation_0.npz') as data:
+        timestep = float(data["timestep"])
+        link_data = data["links"][:, 0, :]
+        joints_data = data["joints"]
 
-def main(save=True):
+    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+
+    pos = link_data      
+    
+    """Plot gps trajectory"""
+    
+    plt.figure("exercise_9d1_trajectory_plot")
+    plot_trajectory(pos,'Turning')
+
+    """Plot spine angles"""
+    joint_angles = joints_data[:,:,0]
+    
+    plot_body_joints(times[:10000], joint_angles[:10000], variable='exercise_9d1_spine_angles_plot',title='Spine angle evolution turning')
+
+def exercise_9d2_plots():
+    
+    with np.load('logs/exercise_9d2/simulation_0.npz') as data:
+        timestep = float(data["timestep"])
+        link_data = data["links"][:, 0, :]
+        joints_data = data["joints"]
+
+    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+
+    pos = link_data      
+    
+    """Plot gps trajectory"""
+    
+    plt.figure("exercise_9d2_trajectory_plot")
+    plot_trajectory(pos,'Backwards')
+
+    """Plot spine angles"""
+    joint_angles = joints_data[:,:,0]
+    
+    plot_body_joints(times[:10000], joint_angles[:10000], variable='exercise_9d2_spine_angles_plot',title='Spine angle evolution backwards')
+
+
+def main(save=False):
     """Main"""
     # Load data
     exercise_9c_plots()
-
+    exercise_9d1_plots()
+    exercise_9d2_plots()
     # Show plots
     if save:
         save_figures()
@@ -239,5 +275,5 @@ def main(save=True):
 
 
 if __name__ == '__main__':
-    main(save=True)
+    main(save=False)
 
