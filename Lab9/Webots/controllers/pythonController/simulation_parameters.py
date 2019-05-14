@@ -20,8 +20,10 @@ class SimulationParameters(dict):
         # Feel free to add more parameters (ex: MLR drive)
         #self.drive_mlr = 0.1
         #self.drive= 0
-        
-        
+
+        # Neural net parameters
+        self.weak_coupling = 10
+        self.strong_coupling = 30
         
         self.dlowBody = 1
         self.dhighBody = 5
@@ -40,14 +42,14 @@ class SimulationParameters(dict):
         self.fsatBody = 0.0
         self.fsatLimb = 0.0
         self.RsatBody = 0.0
-        self.RsatLimb =0.0
+        self.RsatLimb = 0.0
         
         self.RHead = 1
         self.RTail = 1
         
         self.Backwards = False
         
-        self.turnRate = [1,1]
+        self.turnRate = [1, 1]
         # Update object with provided keyword arguments
         self.update(kwargs)  # NOTE: This overrides the previous declarations
 
