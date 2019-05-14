@@ -41,9 +41,9 @@ class ExperimentLogger(object):
         """Log joint position"""
         self.joints[iteration, joint, self.ID_J["position"]] = position
 
-    # def log_joint_velocity(self, iteration, joint, velocity):
-    #     """Log joint velocity"""
-    #     self.joints[iteration, joint, self.ID_J["velocity"]] = velocity
+    #def log_joint_velocity(self, iteration, joint, velocity):
+        #"""Log joint velocity"""
+        #self.joints[iteration, joint, self.ID_J["velocity"]] = velocity
 
     def log_joint_cmd(self, iteration, joint, cmd):
         """Log joint cmd"""

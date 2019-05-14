@@ -2,6 +2,7 @@
 
 import numpy as np
 from scipy.interpolate import griddata
+import scipy.signal as signal
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 # from cmc_robot import ExperimentLogger
@@ -133,12 +134,134 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
     plt.ylabel(labels[1])
     cbar = plt.colorbar()
     cbar.set_label(labels[2])
+    
+def Exercise_9b_plot_gridsearch_speed():
+    meanspeed=[]
 
+    amplitudes=[]
+    phase_lags=[]
+    
+    for i in range(0,25):
+        path='logs/exercise_9b/simulation_'+str(i)+'.npz'
+        with np.load(path) as data:
+            timestep = float(data["timestep"])
+            position = data["links"][:, 0, :]
+            phase_lag_data = data["phase_lag"]
+            amplitudes_data = data["amplitudes"]
+            
+        xvelocity = np.diff(position[:,0], axis=0) / timestep     
+        yvelocity = np.diff(position[:,1], axis=0) / timestep
+        meanspeed= np.append(meanspeed,np.mean(xvelocity)+np.mean(yvelocity))
+        amplitudes = np.append(amplitudes,amplitudes_data)
+        phase_lags = np.append(phase_lags,phase_lag_data)
+        
+    meanspeed=np.reshape(meanspeed,(5,5))  
+  
+     
+
+    # 3D data containers
+    amplitudes_3d = np.zeros_like(meanspeed)
+    phase_lags_3d = np.zeros_like(meanspeed)
+
+    phase_lags_3d = np.reshape(phase_lags,(5,5))
+    amplitudes_3d = np.reshape(amplitudes,(5,5))
+
+    # 3D plots
+    fig = plt.figure("9b_SpeedPhaseLagsAmplitudes")
+    plt.title("Speed")
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(phase_lags_3d, amplitudes_3d, meanspeed, cmap=cm.coolwarm)
+    ax.set_xlabel('phase lag')
+    ax.set_ylabel('oscillation amplitude')
+    ax.set_zlabel("Robot Speed")
+    print(np.argmax(meanspeed,axis=0))
+    print(np.argmax(meanspeed,axis=1))
+
+    
+def Exercise_9b_plot_gridsearch_energy():
+    energies=[]
+
+    amplitudes=[]
+    phase_lags=[]
+    
+    for i in range(0,25):
+        path='logs/exercise_9b/simulation_'+str(i)+'.npz'
+        with np.load(path) as data:
+            timestep = float(data["timestep"])
+            velocities = data["joints"][:, :, 1]
+            torques = data["joints"][:,:,3]
+            phase_lag_data = data["phase_lag"]
+            amplitudes_data = data["amplitudes"]
+        
+        amplitudes = np.append(amplitudes,amplitudes_data)
+        phase_lags = np.append(phase_lags,phase_lag_data)
+        energies = np.append(energies, np.sum(torques*velocities*timestep))
+     
+    energies=np.reshape(energies,(5,5))
+
+    # 3D data containers
+    amplitudes_3d = np.zeros_like(energies)
+    phase_lags_3d = np.zeros_like(energies)
+
+    phase_lags_3d = np.reshape(phase_lags,(5,5))
+    amplitudes_3d = np.reshape(amplitudes,(5,5))
+
+    # 3D plots
+    fig = plt.figure("9b_EnergyPhaseLagsAmplitudes")
+    plt.title("Speed")
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(phase_lags_3d, amplitudes_3d, energies, cmap=cm.coolwarm)
+    ax.set_xlabel('phase lag')
+    ax.set_ylabel('oscillation amplitude')
+    ax.set_zlabel("Robot Energy consumed")  
+    
+#def Exercise_9b_plot_gridsearch_wavelength():
+#    wavelength=[]
+#    position=[]
+#    amplitudes=[]
+#    phase_lags=[]
+#    
+#    for i in range(0,25):
+#        path='logs/exercise_9b/simulation_'+str(i)+'.npz'
+#        with np.load(path) as data:
+#            timestep = float(data["timestep"])
+#            position_data = data["joints"][:, :, 0]
+#            position_data = data["links"][:, 0, :]
+#            phase_lag_data = data["phase_lag"]
+#            amplitudes_data = data["amplitudes"]
+#        print(position_data.shape) 
+#        peakind = signal.find_peaks_cwt(-position_data[:,2], np.array([100]), min_snr=5)
+#        peakind = np.array(peakind)
+#        wavelength=np.append(wavelength,peakind[-2]-peakind[-3])
+#        #plt.plot(range(0,len(position_data[:,2]),position_data[:,2])
+#        #plt.stem(1+0*peakind)       
+#        
+#        amplitudes = np.append(amplitudes,amplitudes_data)
+#        phase_lags = np.append(phase_lags,phase_lag_data)
+#        
+#    wavelength = np.reshape(wavelength,(5,5))
+#    
+#
+#    # 3D data containers
+#    amplitudes_3d = np.zeros_like(wavelenght)
+#    phase_lags_3d = np.zeros_like(wavelength)
+#
+#    phase_lags_3d = np.reshape(phase_lags,(5,5))
+#    amplitudes_3d = np.reshape(amplitudes,(5,5))
+#
+#    # 3D plots
+#    fig = plt.figure("9b_EnergyPhaseLagsAmplitudes")
+#    plt.title("Speed")
+#    ax = fig.add_subplot(111, projection='3d')
+#    ax.plot_surface(phase_lags_3d, amplitudes_3d, wavelength, cmap=cm.coolwarm)
+#    ax.set_xlabel('phase lag')
+#    ax.set_ylabel('oscillation amplitude')
+#    ax.set_zlabel("Wavelength")  
 
 def main(save=True):
     """Main"""
     # Load data
-    with np.load('logs/exercise_9g/simulation_0.npz') as data:
+    with np.load('logs/exercise_9b/simulation_0.npz') as data:
         timestep = float(data["timestep"])
         amplitude = data["amplitudes"]
         phase_lag = data["phase_lag"]
@@ -146,10 +269,12 @@ def main(save=True):
         joints_data = data["joints"]
     times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
 
-    print(amplitude.shape)
-    print(phase_lag.shape)
-    print(link_data.shape)
-    print(joints_data.shape)
+    #print(amplitude.shape)
+    #print(phase_lag.shape)
+    #print(link_data.shape)
+    #print(joints_data.shape)
+
+    
     # Plot data
     plt.figure("Positions")
     plot_positions(times, link_data)
@@ -157,12 +282,14 @@ def main(save=True):
     #plt.figure("Joints")
     #plot_positions(times, joints_data[:,1])
 
-    plt.figure("Trajectory")
-    plot_trajectory(link_data)
+    #plt.figure("Trajectory")
+    #plot_trajectory(link_data)
     
-    plt.figure("2dPlot")
-    plot_2d(link_data, ['x','y','z'])
-
+    #plt.figure("2dPlot")
+    #plot_2d(link_data, ['x','y','z'])
+    Exercise_9b_plot_gridsearch_speed()
+    Exercise_9b_plot_gridsearch_energy()
+    #Exercise_9b_plot_gridsearch_wavelength()
     # Show plots
     if save:
         save_figures()

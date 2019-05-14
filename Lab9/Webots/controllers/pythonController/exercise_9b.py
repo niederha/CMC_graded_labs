@@ -21,8 +21,8 @@ def exercise_9b(world, timestep, reset):
             turnRate=[1,1],
             # ...
         )
-        for amplitude in np.linspace(0.1,0.5, 5)
-        for phase_lag in np.linspace(0,2*np.pi/10, 5)
+        for amplitude in np.linspace(0.1,0.5, 10)
+        for phase_lag in np.linspace(0, 3, 30)
     ]
 
     # Grid search
@@ -33,6 +33,7 @@ def exercise_9b(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/exercise_9b/simulation_{}.npz".format(simulation_i)
+            #logs="./logs/exercise_9b/simulation_{}.npz".format(simulation_i)
+            logs="./logs/test/simulation_{}.npz".format(simulation_i)
         )
 

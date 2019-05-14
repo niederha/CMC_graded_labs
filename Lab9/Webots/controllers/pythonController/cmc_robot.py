@@ -89,10 +89,10 @@ class SalamanderCMC(object):
                 self.position_sensors[i].getValue()
             )
             # # Velocity
-            # self.log.log_joint_velocity(
-            #     self.iteration, i,
-            #     motor.getVelocity()
-            # )
+            #self.log.log_joint_velocity(
+                #self.iteration, i,
+               # motor.getVelocity()
+             #)
             # Command
             self.log.log_joint_cmd(
                 self.iteration, i,
@@ -114,11 +114,11 @@ class SalamanderCMC(object):
                 self.iteration, 10+i,
                 self.position_sensors[10+i].getValue()
             )
-            # # Velocity
-            # self.log.log_joint_velocity(
-            #     self.iteration, i,
-            #     motor.getVelocity()
-            # )
+            # Velocity
+#            self.log.log_joint_velocity(
+#                self.iteration, i,
+#                motor.getVelocity()
+#            )
             # Command
             self.log.log_joint_cmd(
                 self.iteration, 10+i,
