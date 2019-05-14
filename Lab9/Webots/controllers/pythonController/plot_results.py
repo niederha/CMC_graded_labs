@@ -73,6 +73,15 @@ def plot_positions(times, link_data):
     plt.xlabel("Time [s]")
     plt.ylabel("Distance [m]")
     plt.grid(True)
+    
+def plot_velocity(times, velocity):
+    """Plot positions"""
+    for i, data in enumerate(velocity.T):
+        plt.plot(times, data, label=[i])
+    plt.legend()
+    plt.xlabel("Time [s]")
+    plt.ylabel("Velocity [m/s]")
+    plt.grid(True)
 
 
 def plot_trajectory(link_data):
@@ -128,34 +137,39 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
     cbar = plt.colorbar()
     cbar.set_label(labels[2])
 
-
-def main(plot=True):
-    """Main"""
-    # Load data
-    with np.load('logs/exercise_9g/simulation_0.npz') as data:
+def exercise_9c_plots():
+    with np.load('logs/exercise_9c/simulation_0.npz') as data:
         timestep = float(data["timestep"])
         amplitude = data["amplitudes"]
         phase_lag = data["phase_lag"]
         link_data = data["links"][:, 0, :]
         joints_data = data["joints"]
     times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
-
+    
+    print(joints_data[:,:,1].shape)
     print(amplitude.shape)
     print(phase_lag.shape)
     print(link_data.shape)
     print(joints_data.shape)
+    
     # Plot data
-    plt.figure("Positions")
-    plot_positions(times, link_data)
+    #plt.figure("Positions")
+    #plot_positions(times, link_data)
 
-    #plt.figure("Joints")
-    #plot_positions(times, joints_data[:,1])
+    #plt.figure("Velocity")
+    #plot_velocity(times, joints_data[:,:,1])
 
     plt.figure("Trajectory")
     plot_trajectory(link_data)
     
-    plt.figure("2dPlot")
-    plot_2d(link_data, ['x','y','z'])
+    #plt.figure("2dPlot")
+    #plot_2d(link_data, ['x','y','z'])
+
+
+def main(plot=True):
+    """Main"""
+    # Load data
+    exercise_9c_plots()
 
     # Show plots
     if plot:

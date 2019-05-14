@@ -176,6 +176,8 @@ class SalamanderCMC(object):
             print('Going backward')
             self.SimulationParameters.Backwards = True
             self.NetworkParameters.set_phase_bias(self.SimulationParameters)
+            self.SimulationParameters.turnRate = [1,1]
+            self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
             self.lastkey = key
             
         if (key==ord('T') and key is not self.lastkey):

@@ -1,6 +1,5 @@
 """Exercise 9g"""
 
-# from run_simulation import run_simulation
 import numpy as np
 from run_simulation import run_simulation
 from simulation_parameters import SimulationParameters
