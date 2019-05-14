@@ -74,7 +74,7 @@ def run_network(duration, update=False, drive=1):
 
     # Implement plots of network results
 
-    plt.figure(1)
+    plt.figure()
     plt.subplot(221)
     for i in range(0,len(outputs_log[0,:])):
         plt.plot(times,outputs_log[:,i])

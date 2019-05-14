@@ -43,7 +43,6 @@ class RobotParameters(dict):
         """Set frequencies"""
         #pylog.warning("Frequencies must be set")
 
-        #self.freqs = np.ones(self.n_oscillators)*0.01
         if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
             self.freqs[:self.n_oscillators_body]= parameters.cf1Body*parameters.drive+parameters.cf0Body
         else:
@@ -58,47 +57,7 @@ class RobotParameters(dict):
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
         #pylog.warning("Coupling weights must be set")
-        
-        """
-        travelingWave = 10
-        legInPhase = 30
-        legAntiPhase = 10
-        
-#        travelingWave = 1
-#        legInPhase = 2
-#        legAntiPhase = 3
-        
-        
-        size = int(self.n_oscillators_body/2)
-        #size = 6
-        
-        self.coupling_weights = np.zeros([self.n_oscillators,self.n_oscillators])
-        #parameters.phase_bias = np.zeros([size*3,size*3])
-        self.coupling_weights[:2*size,:2*size] = travelingWave*(    np.eye(2*size,k=-1) 
-                                                                        + np.eye(2*size,k=1)     
-                                                                        + np.eye(2*size,k=size) 
-                                                                        + np.eye(2*size,k=-size))
-        
-        self.coupling_weights[int(size*2),:int(size/2)] = legInPhase
-        self.coupling_weights[int(size*2),int(size*2)+1] = legAntiPhase
-        self.coupling_weights[int(size*2),int(size*2)+2] = legAntiPhase
-        
-        self.coupling_weights[int(size*2)+1,size:int(3*size/2)] = legInPhase
-        self.coupling_weights[int(size*2)+1,int(size*2)] = legAntiPhase
-        self.coupling_weights[int(size*2)+1,int(size*2)+3] = legAntiPhase
-        
-        self.coupling_weights[int(size*2)+2,int(size/2):size] = legInPhase
-        self.coupling_weights[int(size*2)+2,int(size*2)] = legAntiPhase
-        self.coupling_weights[int(size*2)+2,int(size*2)+3] = legAntiPhase
-        
-        self.coupling_weights[int(size*2)+3,int(3*size/2):int(2*size)] = legInPhase
-        self.coupling_weights[int(size*2)+3,int(size*2)+1] = legAntiPhase
-        self.coupling_weights[int(size*2)+3,int(size*2)+2] = legAntiPhase
-     
-#        for x in parameters.coupling_weights:
-#            print(*x, sep="   ")
-#        print(parameters.phase_bias.shape)
-        """
+
         if(platform.system() == 'Linux'):
             self.coupling_weights = genfromtxt('Arrays/Coupling_Weights.csv', delimiter=',')
         else:
@@ -107,55 +66,24 @@ class RobotParameters(dict):
     def set_phase_bias(self, parameters):
         """Set phase bias"""
         #pylog.warning("Phase bias must be set")
-        """
-        travelingWave = 2*np.pi/self.n_joints
-        legInPhase = 0
-        legAntiPhase = np.pi
-        
-#        travelingWave = 1
-#        legInPhase = 2
-#        legAntiPhase = 3
-        
-        
-        size = int(self.n_oscillators_body/2)
-        #size = 6
-        
-        self.phase_bias = np.zeros([self.n_oscillators,self.n_oscillators])
-        #parameters.phase_bias = np.zeros([size*3,size*3])
-        self.phase_bias[:2*size,:2*size] = ( - travelingWave*np.eye(2*size,k=-1) 
-                                + travelingWave*np.eye(2*size,k=1)        
-                                + legAntiPhase* np.eye(2*size,k=size)   
-                                + legAntiPhase* np.eye(2*size,k=-size))
-        
-        self.phase_bias[int(size*2),:int(size/2)] = legInPhase
-        self.phase_bias[int(size*2),int(size*2)+1] = legAntiPhase
-        self.phase_bias[int(size*2),int(size*2)+2] = legAntiPhase
-        
-        self.phase_bias[int(size*2)+1,size:int(3*size/2)] = legInPhase
-        self.phase_bias[int(size*2)+1,int(size*2)] = -legAntiPhase*(-1)
-        self.phase_bias[int(size*2)+1,int(size*2)+3] = -legAntiPhase*(-1)
-        
-        self.phase_bias[int(size*2)+2,int(size/2):size] = legInPhase
-        self.phase_bias[int(size*2)+2,int(size*2)] = -legAntiPhase*(-1)
-        self.phase_bias[int(size*2)+2,int(size*2)+3] = -legAntiPhase*(-1)
-        
-        self.phase_bias[int(size*2)+3,int(3*size/2):int(2*size)] = legInPhase
-        self.phase_bias[int(size*2)+3,int(size*2)+1] = legAntiPhase
-        self.phase_bias[int(size*2)+3,int(size*2)+2] = legAntiPhase
-
-    
-        """     
+ 
         if(platform.system() == 'Linux'):
             self.phase_bias = genfromtxt('Arrays/Phase_Shifts.csv', delimiter=',')
         else:
             self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')
-        #self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')  
+        
+        # Change body phase lag for Ex9b
+        if parameters.phase_lag is not None:
+            for i in range(self.n_oscillators_body):
+                # Neighbour coupling
+                if i != (self.n_oscillators_body / 2) - 1 and i < (self.n_oscillators_body - 1):
+                    self.phase_bias[i][i + 1] = -parameters.phase_lag
+                    self.phase_bias[i + 1][i] = parameters.phase_lag
+            # All other coupling remain identical
+        
         if parameters.Backwards:
             self.phase_bias *= -1 
 
-#        for x in parameters.phase_bias:
-#            print(*x, sep="   ")
-#        print(parameters.phase_bias.shape)
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
@@ -165,20 +93,22 @@ class RobotParameters(dict):
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
         #pylog.warning("Nominal amplitudes must be set")
-        #self.nominal_amplitudes = np.ones(self.n_oscillators)*np.pi/8
-        
-        if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
-            self.nominal_amplitudes[:self.n_oscillators_body]= parameters.cR1Body*parameters.drive+parameters.cR0Body
+        if parameters.amplitudes is not None:
+            self.nominal_amplitudes[:self.n_oscillators_body] = parameters.amplitudes
+            #print(self.nominal_amplitudes)
         else:
-            self.nominal_amplitudes[:self.n_oscillators_body]= parameters.RsatBody
-        
-        if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
-            self.nominal_amplitudes[self.n_oscillators_body:]= parameters.cR1Limb*parameters.drive+parameters.cR0Limb
-        else:
-            self.nominal_amplitudes[self.n_oscillators_body:]= parameters.RsatLimb
-        
+            if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
+                self.nominal_amplitudes[:self.n_oscillators_body]= parameters.cR1Body*parameters.drive+parameters.cR0Body
+            else:
+                self.nominal_amplitudes[:self.n_oscillators_body]= parameters.RsatBody
+            
+            if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
+                self.nominal_amplitudes[self.n_oscillators_body:]= parameters.cR1Limb*parameters.drive+parameters.cR0Limb
+            else:
+                self.nominal_amplitudes[self.n_oscillators_body:]= parameters.RsatLimb
+            
         gradient = np.ones(self.n_oscillators)   
-        bodylength = self.n_body_joints
+
         gradient[:self.n_body_joints] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[0]
         gradient[self.n_body_joints:self.n_oscillators_body] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[1]      
         self.nominal_amplitudes *= gradient 

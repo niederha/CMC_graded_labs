@@ -11,18 +11,17 @@ def exercise_9b(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,
-            drive=drive,
-            amplitudes=[1, 2, 3],
+            drive=4,
+            amplitudes=amplitude,
             RHead = 1,
             RTail = 1,
             Backwards = False,
-            phase_lag=np.zeros(n_joints),
+            phase_lag=phase_lag,
             turnRate=[1,1],
             # ...
         )
-        for drive in np.linspace(4,5, 2)
-        # for amplitudes in ...
-        # for ...
+        for amplitude in np.linspace(0.1,0.5, 5)
+        for phase_lag in np.linspace(0,2*np.pi/10, 5)
     ]
 
     # Grid search
@@ -33,6 +32,6 @@ def exercise_9b(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/example/simulation_{}.npz".format(simulation_i)
+            logs="./logs/exercise_9b/simulation_{}.npz".format(simulation_i)
         )
 

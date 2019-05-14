@@ -14,8 +14,6 @@ def exercise_9g(world, timestep, reset):
         SimulationParameters(
             simulation_duration=40,
             drive=drive,
-            amplitudes=[1, 2, 3],
-            phase_lag=np.zeros(n_joints),
             turn=0,
             # ...
         )
@@ -32,5 +30,5 @@ def exercise_9g(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/example/simulation_{}.npz".format(simulation_i)
+            logs="./logs/exercise_9g/simulation_{}.npz".format(simulation_i)
         )

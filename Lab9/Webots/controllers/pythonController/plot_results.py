@@ -4,7 +4,7 @@ import numpy as np
 from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from cmc_robot import ExperimentLogger
+#from cmc_robot import ExperimentLogger
 from save_figures import save_figures
 from parse_args import save_plots
 
@@ -76,7 +76,7 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
 def main(plot=True):
     """Main"""
     # Load data
-    with np.load('logs/example/simulation_0.npz') as data:
+    with np.load('logs/exercise_9g/simulation_0.npz') as data:
         timestep = float(data["timestep"])
         amplitude = data["amplitudes"]
         phase_lag = data["phase_lag"]
@@ -84,9 +84,22 @@ def main(plot=True):
         joints_data = data["joints"]
     times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
 
+    print(amplitude.shape)
+    print(phase_lag.shape)
+    print(link_data.shape)
+    print(joints_data.shape)
     # Plot data
     plt.figure("Positions")
     plot_positions(times, link_data)
+
+    #plt.figure("Joints")
+    #plot_positions(times, joints_data[:,1])
+
+    plt.figure("Trajectory")
+    plot_trajectory(link_data)
+    
+    plt.figure("2dPlot")
+    plot_2d(link_data, ['x','y','z'])
 
     # Show plots
     if plot:
