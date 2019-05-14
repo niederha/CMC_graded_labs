@@ -46,21 +46,21 @@ class RobotParameters(dict):
 
         # Unsaturated body
         if parameters.body_saturation[0] <= parameters.mlr_drive <= parameters.body_saturation[1]:
-            self.freqs[:self.n_body_joints] = parameters.c_freq_body[0] + \
+            self.freqs[:self.n_oscillators_body] = parameters.c_freq_body[0] + \
                                               parameters.mlr_drive * parameters.c_freq_body[1]
 
         # Saturated body
         else:
-            self.freqs[:self.n_body_joints] = parameters.v_sat
+            self.freqs[:self.n_oscillators_body] = parameters.v_sat
 
         # Unsaturated limbs
         if parameters.limb_saturation[0] <= parameters.mlr_drive <= parameters.limb_saturation[1]:
-            self.freqs[self.n_body_joints:] = parameters.c_freq_limb[0] + \
+            self.freqs[self.n_oscillators_body:] = parameters.c_freq_limb[0] + \
                                               parameters.mlr_drive * parameters.c_freq_limb[1]
 
         # Saturated limbs
         else:
-            self.freqs[self.n_body_joints:] = parameters.v_sat
+            self.freqs[self.n_oscillators_body:] = parameters.v_sat
 
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
@@ -88,21 +88,21 @@ class RobotParameters(dict):
 
         # Unsaturated body
         if parameters.body_saturation[0] <= parameters.mlr_drive <= parameters.body_saturation[1]:
-            self.nominal_amplitudes[:self.n_body_joints] = parameters.c_R_body[0] + \
+            self.nominal_amplitudes[:self.n_oscillators_body] = parameters.c_R_body[0] + \
                                                            parameters.mlr_drive * parameters.c_R_body[1]
 
         # Saturated body
         else:
-            self.nominal_amplitudes[:self.n_body_joints] = parameters.R_sat
+            self.nominal_amplitudes[:self.n_oscillators_body] = parameters.R_sat
 
         # Unsaturated limbs
         if parameters.limb_saturation[0] <= parameters.mlr_drive <= parameters.limb_saturation[1]:
-            self.nominal_amplitudes[self.n_body_joints:] = parameters.c_R_limb[0] + \
+            self.nominal_amplitudes[self.n_oscillators_body:] = parameters.c_R_limb[0] + \
                                                            parameters.mlr_drive * parameters.c_R_limb[1]
 
         # Saturated limbs
         else:
-            self.nominal_amplitudes[self.n_body_joints:] = parameters.R_sat
+            self.nominal_amplitudes[self.n_oscillators_body:] = parameters.R_sat
 
     def set_mlr_drive(self, parameters):
         self.mlr_drive = parameters.mlr_drive

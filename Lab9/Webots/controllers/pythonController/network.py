@@ -40,12 +40,12 @@ def motor_output(phases, amplitudes, nb_body_joints, nb_legs):
 
     # Body output computations
     for i in range(nb_body_joints):
-        joint_angles[i] = amplitudes[i]*(cos(phases[i]))
-        joint_angles[i] -= amplitudes[i+nb_body_joints]*(cos(phases[i+nb_body_joints]))
+        joint_angles[i] = amplitudes[i]*(1+np.cos(phases[i]))
+        joint_angles[i] -= amplitudes[i+nb_body_joints]*(1+np.cos(phases[i+nb_body_joints]))
 
     # Leg output computations
     for i in range(nb_legs):
-        joint_angles[nb_body_joints + i] = amplitudes[nb_body_joints+i] * (cos(phases[nb_body_joints+i]))
+        joint_angles[nb_body_joints + i] = amplitudes[nb_body_joints*2+i] * (cos(phases[nb_body_joints*2+i]))
 
     return joint_angles
 
