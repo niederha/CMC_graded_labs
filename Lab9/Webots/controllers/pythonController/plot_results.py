@@ -11,13 +11,33 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
 
+def plot_phase_joints(time, phase_angles, variable='body phases', gait="walking"):
+    nb_legs = 4
+    nb_body = phase_angles.shape[1]-nb_legs
+    plt.figure(variable.replace(" ", "_"))
+
+    plt.plot(time, phase_angles[:, 0],
+             label="body joint " + str(0))
+    plt.plot(time, phase_angles[:, 10],
+             label="body joint " + str(10))
+    plt.grid()
+    plt.legend()
+    plt.title(variable + " evolution")
+
+    plt.figure("phase_difference " + gait)
+    diff = np.subtract(phase_angles[:, 0], phase_angles[:, 10])
+    plt.plot(time, diff)
+    plt.title("phase_difference " + gait)
+    plt.grid()
+
+
 def plot_body_joints(time, joint_angles, variable='body joint angle'):
     nb_legs = 4
     nb_body = joint_angles.shape[1]-nb_legs
     plt.figure(variable.replace(" ", "_"))
     offset = joint_angles[:nb_body].max()-joint_angles[:nb_body].min()
     for body_joint_index in range(nb_body):
-        plt.plot(time, joint_angles[:, body_joint_index]+0.75*body_joint_index*offset,
+        plt.plot(time, joint_angles[:, body_joint_index]+0.9*body_joint_index*offset,
                  label="body joint " + str(body_joint_index))
     plt.grid()
     plt.legend()
@@ -31,7 +51,7 @@ def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
     offset = joint_angles[nb_body:].max()-joint_angles[nb_body:].min()
 
     for leg_joint_index in range(nb_legs):
-        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+0.75*leg_joint_index*offset,
+        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+0.9*leg_joint_index*offset,
                  label="leg joint " + str(leg_joint_index))
     plt.grid()
     plt.legend()
