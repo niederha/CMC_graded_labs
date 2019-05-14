@@ -10,6 +10,11 @@ leg_to_body_coupling = [[0, 1, 2, 3, 4],
                         [5, 6, 7, 8, 9],
                         [15, 16, 17, 18, 19]]
 
+leg_to_leg_coupling = [[21, 22],
+                       [20, 23],
+                       [20, 23],
+                       [21, 22]]
+
 save_folder = 'C:\\Users\\loicn\\Documents\\MA_current\\CMC\\CMC_graded_labs\\Lab9\\Neural_net_matrices\\'
 coupling_weights_file = save_folder + 'coupling_weights.csv'
 phase_bias_file = save_folder + 'phase_bias.csv'
@@ -46,15 +51,9 @@ class FileGenerator:
         # endregion
 
         # region Limb coupling
-        for i in range(self.n_oscillators_legs - 1):
-            self.coupling_weights[self.n_oscillators_body + i][self.n_oscillators_body + i + 1] = \
-                self.parameters.weak_coupling
-            self.coupling_weights[self.n_oscillators_body + i + 1][self.n_oscillators_body + i] = \
-                self.parameters.weak_coupling
-        self.coupling_weights[self.n_oscillators_body][self.n_oscillators_body + 
-                                                       self.n_oscillators_legs - 1] = self.parameters.weak_coupling
-        self.coupling_weights[self.n_oscillators_body + 
-                              self.n_oscillators_legs - 1][self.n_oscillators_body] = self.parameters.weak_coupling
+        for i in range(self.n_oscillators_legs):
+            for j in leg_to_leg_coupling[i][:]:
+                self.coupling_weights[self.n_oscillators_body + i][j] = self.parameters.weak_coupling
         # endregion
 
         # region Limb to body coupling
@@ -66,12 +65,12 @@ class FileGenerator:
         # Save as CSV file
         np.savetxt(coupling_weights_file, self.coupling_weights, delimiter=',')
     
-    def generate_phase_bias_matrix(self):
+    def generate_phase_bias_file(self):
 
         # Phase definitions
         in_phase = 0
         in_anti_phase = np.pi
-        phase_lag = 2*np.pi/self.n_oscillators_body
+        phase_lag = 2*np.pi/(self.n_oscillators_body/2)
 
         # region Couple body oscillators
         for i in range(self.n_oscillators_body):
@@ -86,14 +85,11 @@ class FileGenerator:
         # endregion
 
         # region Limb coupling
-        for i in range(self.n_oscillators_legs - 1):
-            self.phase_bias[self.n_oscillators_body + i][self.n_oscillators_body + i + 1] = in_anti_phase
-            self.phase_bias[self.n_oscillators_body + i + 1][self.n_oscillators_body + i] = in_anti_phase
-        self.phase_bias[self.n_oscillators_body][self.n_oscillators_body +
-                                                 self.n_oscillators_legs - 1] = in_anti_phase
-        self.phase_bias[self.n_oscillators_body +
-                        self.n_oscillators_legs - 1][self.n_oscillators_body] = in_anti_phase
+        for i in range(self.n_oscillators_legs):
+            for j in leg_to_leg_coupling[i][:]:
+                self.phase_bias[self.n_oscillators_body + i][j] = in_anti_phase
         # endregion
+
 
         # region Limb to body coupling
         for i in range(self.n_oscillators_legs):
