@@ -12,7 +12,8 @@ def save_plots():
         "--save", "-s",
         help="Save figures",
         dest="save",
-        action="store_true"
+        action="store_true",
+        default=False
     )
     return parser.parse_args().save
 
