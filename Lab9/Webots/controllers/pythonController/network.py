@@ -37,15 +37,14 @@ def motor_output(phases, amplitudes):
     for i in range(0,motors_len):
         dmotor[i] = amplitudes[i]*(1+np.cos(phases[i]))-amplitudes[i+motors_len]*(1+np.cos(phases[i+motors_len]))  
     #print(dmotor)
-    for i in range(motors_len,14):
+    for i in range(motors_len, 14):
         
         if amplitudes[motors_len+i] < 0.0000001:
             phases[motors_len+i] = 0
             dmotor[i] = 0
         else:
             dmotor[i] = -phases[motors_len+i]
-            
-    
+
     return dmotor
 
 
