@@ -9,7 +9,7 @@ from save_figures import save_figures
 from parse_args import save_plots
 
 from mpl_toolkits.mplot3d import Axes3D  # Module for 3D plots
-from matplotlib import cm  # Module for colormaps
+from matplotlib import cm  # Module for color maps
 
 
 def plot_body_joints(time, joint_angles, variable='body joint angle'):
@@ -19,7 +19,7 @@ def plot_body_joints(time, joint_angles, variable='body joint angle'):
     plt.figure(variable.replace(" ", "_"))
     offset = joint_angles[:, :nb_body].max()-joint_angles[:, :nb_body].min()
     for body_joint_index in range(nb_body):
-        plt.plot(time, joint_angles[:, body_joint_index]+.75*body_joint_index*offset,
+        plt.plot(time, joint_angles[:, body_joint_index]+1.*(nb_body-body_joint_index-1)*offset,
                  label="body joint " + str(body_joint_index))
     plt.grid()
     plt.legend()
@@ -31,10 +31,16 @@ def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
     nb_legs = 4
     nb_body = joint_angles.shape[1]-nb_legs
     plt.figure(variable.replace(" ", "_"))
+
+    # Wrap up legs output:
+    joint_angles[:, nb_body:] %= 2 * np.pi
+
     offset = joint_angles[:, nb_body:].max()-joint_angles[:, nb_body:].min()
+    if offset == 0:
+        offset = 1
 
     for leg_joint_index in range(nb_legs):
-        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+.75*leg_joint_index*offset,
+        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+1.*(nb_legs-1-leg_joint_index)*offset,
                  label="leg joint " + str(leg_joint_index))
     plt.grid()
     plt.legend()
@@ -129,7 +135,7 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
     cbar.set_label(labels[2])
 
 
-def main(plot=True):
+def main(save=True):
     """Main"""
     # Load data
     with np.load('logs/exercise_9g/simulation_0.npz') as data:
@@ -158,12 +164,11 @@ def main(plot=True):
     plot_2d(link_data, ['x','y','z'])
 
     # Show plots
-    if plot:
-        plt.show()
-    else:
+    if save:
         save_figures()
+    plt.show()
 
 
 if __name__ == '__main__':
-    main(plot=not save_plots())
+    main(save=True)
 
