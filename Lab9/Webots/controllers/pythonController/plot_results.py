@@ -37,10 +37,10 @@ def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
 
     offset = joint_angles[:, nb_body:].max()-joint_angles[:, nb_body:].min()
     if offset == 0:
-        offset = 1
+        offset = 0.5
 
     for leg_joint_index in range(nb_legs):
-        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+1.*(nb_legs-1-leg_joint_index)*offset,
+        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+1.1*(nb_legs-1-leg_joint_index)*offset,
                  label="leg joint " + str(leg_joint_index))
     plt.grid()
     plt.legend()
