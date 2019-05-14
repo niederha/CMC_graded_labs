@@ -1,3 +1,5 @@
+""" When imported writes new phase bias and weights matrices in save_folder"""
+
 import numpy as np
 from math import inf
 
@@ -15,7 +17,7 @@ leg_to_leg_coupling = [[21, 22],
                        [20, 23],
                        [21, 22]]
 
-save_folder = 'C:\\Users\\loicn\\Documents\\MA_current\\CMC\\CMC_graded_labs\\Lab9\\Neural_net_matrices\\'
+save_folder = 'Arrays\\'
 coupling_weights_file = save_folder + 'coupling_weights.csv'
 phase_bias_file = save_folder + 'phase_bias.csv'
 
@@ -98,3 +100,8 @@ class FileGenerator:
 
         # Save as CSV file
         np.savetxt(phase_bias_file, self.phase_bias, delimiter=',')
+
+
+file_generator = FileGenerator()
+file_generator.generate_weights_file()
+file_generator.generate_phase_bias_file()

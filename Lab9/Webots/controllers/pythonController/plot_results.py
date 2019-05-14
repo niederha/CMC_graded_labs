@@ -4,9 +4,65 @@ import numpy as np
 from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-#from cmc_robot import ExperimentLogger
+# from cmc_robot import ExperimentLogger
 from save_figures import save_figures
 from parse_args import save_plots
+
+from mpl_toolkits.mplot3d import Axes3D  # Module for 3D plots
+from matplotlib import cm  # Module for colormaps
+
+
+def plot_body_joints(time, joint_angles, variable='body joint angle'):
+    """ Extracts and plots motor output for body joints"""
+    nb_legs = 4
+    nb_body = joint_angles.shape[1]-nb_legs
+    plt.figure(variable.replace(" ", "_"))
+    offset = joint_angles[:, :nb_body].max()-joint_angles[:, :nb_body].min()
+    for body_joint_index in range(nb_body):
+        plt.plot(time, joint_angles[:, body_joint_index]+.75*body_joint_index*offset,
+                 label="body joint " + str(body_joint_index))
+    plt.grid()
+    plt.legend()
+    plt.title(variable + " evolution")
+
+
+def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
+    """ Extracts and plots motor output for body joints"""
+    nb_legs = 4
+    nb_body = joint_angles.shape[1]-nb_legs
+    plt.figure(variable.replace(" ", "_"))
+    offset = joint_angles[:, nb_body:].max()-joint_angles[:, nb_body:].min()
+
+    for leg_joint_index in range(nb_legs):
+        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+.75*leg_joint_index*offset,
+                 label="leg joint " + str(leg_joint_index))
+    plt.grid()
+    plt.legend()
+    plt.title(variable + " evolution")
+
+
+def plot_3d_variable(times, variable_log, variable_name):
+    """ Plots a variable as a 3D surface depending on joint_number (Y axis) and time(X axis)"""
+    nb_joints = variable_log.shape[1]
+
+    # 3D data containers
+    times_3d = np.zeros_like(variable_log)
+    joint_number_3d = np.zeros_like(variable_log)
+
+    for i in range(nb_joints):
+        times_3d[:, i] = times
+
+    for i in range(len(times)):
+        joint_number_3d[i, :] = np.arange(nb_joints)
+
+    # 3D plots
+    fig = plt.figure(variable_name.replace(" ", "_")+"_plot")
+    plt.title(variable_name)
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(times_3d, joint_number_3d, variable_log, cmap=cm.coolwarm)
+    ax.set_xlabel('time')
+    ax.set_ylabel('joint number')
+    ax.set_zlabel(variable_name)
 
 
 def plot_positions(times, link_data):
