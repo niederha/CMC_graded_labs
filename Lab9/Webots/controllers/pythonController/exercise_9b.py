@@ -13,6 +13,7 @@ def exercise_9b(world, timestep, reset):
             simulation_duration=10,
             drive=4,
             amplitudes=amplitude,
+            frequency=1,
             RHead = 1,
             RTail = 1,
             Backwards = False,

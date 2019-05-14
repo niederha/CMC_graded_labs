@@ -42,16 +42,19 @@ class RobotParameters(dict):
     def set_frequencies(self, parameters):
         """Set frequencies"""
         #pylog.warning("Frequencies must be set")
-
-        if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
-            self.freqs[:self.n_oscillators_body]= parameters.cf1Body*parameters.drive+parameters.cf0Body
+        if parameters.frequency is not None:
+            self.freqs[:self.n_oscillators_body] = parameters.frequency
+            print(self.freqs)
         else:
-            self.freqs[:self.n_oscillators_body]= parameters.fsatBody
-        
-        if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
-            self.freqs[self.n_oscillators_body:]= parameters.cf1Limb*parameters.drive+parameters.cf0Limb
-        else:
-            self.freqs[self.n_oscillators_body:]= parameters.fsatLimb
+            if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
+                self.freqs[:self.n_oscillators_body]= parameters.cf1Body*parameters.drive+parameters.cf0Body
+            else:
+                self.freqs[:self.n_oscillators_body]= parameters.fsatBody
+            
+            if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
+                self.freqs[self.n_oscillators_body:]= parameters.cf1Limb*parameters.drive+parameters.cf0Limb
+            else:
+                self.freqs[self.n_oscillators_body:]= parameters.fsatLimb
         
             
     def set_coupling_weights(self, parameters):
@@ -61,7 +64,7 @@ class RobotParameters(dict):
         if(platform.system() == 'Linux'):
             self.coupling_weights = genfromtxt('Arrays/Coupling_Weights.csv', delimiter=',')
         else:
-            self.coupling_weights = genfromtxt('Arrays\\Coupling_Weights.csv', delimiter=';')
+            self.coupling_weights = genfromtxt('Arrays\\Coupling_Weights.csv', delimiter=',')
 
     def set_phase_bias(self, parameters):
         """Set phase bias"""
@@ -70,7 +73,7 @@ class RobotParameters(dict):
         if(platform.system() == 'Linux'):
             self.phase_bias = genfromtxt('Arrays/Phase_Shifts.csv', delimiter=',')
         else:
-            self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=';')
+            self.phase_bias = genfromtxt('Arrays\\Phase_Shifts.csv', delimiter=',')
         
         # Change body phase lag for Ex9b
         if parameters.phase_lag is not None:
