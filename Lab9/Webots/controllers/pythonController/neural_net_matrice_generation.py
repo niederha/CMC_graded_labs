@@ -90,11 +90,10 @@ class FileGenerator:
                 self.phase_bias[self.n_oscillators_body + i][j] = in_anti_phase
         # endregion
 
-
         # region Limb to body coupling
         for i in range(self.n_oscillators_legs):
             for j in leg_to_body_coupling[i][:]:
-                self.phase_bias[self.n_oscillators_body + i][j] = in_phase
+                self.phase_bias[self.n_oscillators_body + i][j] = in_anti_phase
         # endregion
 
         # Save as CSV file
