@@ -36,7 +36,7 @@ class SimulationParameters(dict):
 
         self.c_freq_body = [0.2, 0.3]  # Gave up on implementing default parameters. Useless in this scope anyway
         self.c_freq_limb = [0.2, 0.0]
-        self.c_R_body = [0.065, 0.13]
+        self.c_R_body = [0.01, 0.1]
         self.c_R_limb = [0.131, 0.131]
 
         self.update(kwargs)  # NOTE: This overrides the previous declarations
