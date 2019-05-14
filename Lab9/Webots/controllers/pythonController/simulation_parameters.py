@@ -1,5 +1,8 @@
 """Simulation parameters"""
 
+strong_coupling = 30
+weak_coupling = 10
+
 
 class SimulationParameters(dict):
     """Simulation parameters"""
@@ -22,8 +25,8 @@ class SimulationParameters(dict):
         #self.drive= 0
 
         # Neural net parameters
-        self.weak_coupling = 10
-        self.strong_coupling = 30
+        self.weak_coupling = weak_coupling
+        self.strong_coupling = strong_coupling
         
         self.dlowBody = 1
         self.dhighBody = 5
