@@ -12,13 +12,9 @@ def exercise_9g(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=40,
-            drive=drive,
-            turn=0,
-            # ...
+            drive=1,
+
         )
-        for drive in np.linspace(1, 5, 2)
-        # for amplitudes in ...
-        # for ...
     ]
 
     # Grid search
