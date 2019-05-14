@@ -44,7 +44,6 @@ class RobotParameters(dict):
         #pylog.warning("Frequencies must be set")
         if parameters.frequency is not None:
             self.freqs[:self.n_oscillators_body] = parameters.frequency
-            print(self.freqs)
         else:
             if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
                 self.freqs[:self.n_oscillators_body]= parameters.cf1Body*parameters.drive+parameters.cf0Body

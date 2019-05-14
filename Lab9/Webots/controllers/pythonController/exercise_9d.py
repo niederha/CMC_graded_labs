@@ -7,10 +7,62 @@ from simulation_parameters import SimulationParameters
 
 def exercise_9d1(world, timestep, reset):
     """Exercise 9d1"""
-    pass
+    n_joints = 10
+    parameter_set = [
+        SimulationParameters(
+            simulation_duration=120,
+            drive=4,
+            #amplitudes=0.5,
+            #frequency=1,
+            #RHead = RHead,
+            #RTail = RTail,
+            Backwards = False,
+            #phase_lag=2*np.pi/10,
+            turnRate=[1,1],
+            # ...
+        )
+        
+    ]
+
+    # Grid search
+    for simulation_i, parameters in enumerate(parameter_set):
+        reset.reset()
+        run_simulation(
+            world,
+            parameters,
+            timestep,
+            int(1000*parameters.simulation_duration/timestep),
+            logs="./logs/exercise_9d1/simulation_{}.npz".format(simulation_i)
+        )
+
 
 
 def exercise_9d2(world, timestep, reset):
     """Exercise 9d2"""
-    pass
+    n_joints = 10
+    parameter_set = [
+        SimulationParameters(
+            simulation_duration=120,
+            drive=4,
+            #amplitudes=0.5,
+            #frequency=1,
+            #RHead = RHead,
+            #RTail = RTail,
+            Backwards = False,
+            phase_lag=2*np.pi/10,
+            turnRate=[1,1],
+            # ...
+        )
+    ]
+
+    # Grid search
+    for simulation_i, parameters in enumerate(parameter_set):
+        reset.reset()
+        run_simulation(
+            world,
+            parameters,
+            timestep,
+            int(1000*parameters.simulation_duration/timestep),
+            logs="./logs/exercise_9d2/simulation_{}.npz".format(simulation_i)
+        )
 
