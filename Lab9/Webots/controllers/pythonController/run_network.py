@@ -8,9 +8,10 @@ from network import SalamanderNetwork
 from save_figures import save_figures
 from parse_args import save_plots
 from simulation_parameters import SimulationParameters
+import plot_results as plt_res
 
 
-def run_network(duration, update=False, drive=1):
+def run_network(duration, update=False, drive=1., gait="Walking"):
     """Run network without Webots and plot results"""
     # Simulation setup
     timestep = 5e-3
@@ -72,43 +73,22 @@ def run_network(duration, update=False, drive=1):
         toc - tic
     ))
 
-    # Implement plots of network results
+    plt_res.plot_body_joints(times, outputs_log, gait + ' body joints')
+    plt_res.plot_leg_joints(times, outputs_log, gait + ' leg joints')
 
-    plt.figure()
-    plt.subplot(221)
-    for i in range(0,len(outputs_log[0,:])):
-        plt.plot(times,outputs_log[:,i])
-    plt.title("Motor Position")
-  
-    plt.subplot(222)
-    for i in range(0,len(freqs_log[0,:])):
-        plt.plot(times,freqs_log[:,i])
-    plt.title("Frequencies")
-
-    plt.subplot(223)
-    for i in range(0,len(amplitudes_log[0,:])):
-        plt.plot(times,amplitudes_log[:,i])
-    plt.title("Amplitudes")
-
-
-    plt.subplot(224)
-    for i in range(0,len(phases_log[0,:])):
-        plt.plot(times,phases_log[:,i])
-    plt.title("Phases")
-    plt.show()
     
-def main(plot):
+def main(save):
     """Main"""
 
-    run_network(duration=5)
+    run_network(duration=20, drive=1., gait='Walking')
+    run_network(duration=20, drive=4., gait='Swimming')
 
     # Show plots
-    if plot:
-        plt.show()
-    else:
+    if save:
         save_figures()
+    plt.show()
 
 
 if __name__ == '__main__':
-    main(plot=not save_plots())
+    main(save=True)
 
