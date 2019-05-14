@@ -2,6 +2,12 @@
 
 import matplotlib.pyplot as plt
 import cmc_pylog as pylog
+import platform
+
+if platform.system() == 'Linux':
+    save_folder = "../../../Report/figures/"
+else:
+    save_folder = "..\\..\\..\\Report\\figures\\"
 
 
 def save_figure(figure, name=None, **kwargs):
@@ -12,12 +18,10 @@ def save_figure(figure, name=None, **kwargs):
             name = "{}.{}".format(fig, extension)
         else:
             name = "{}.{}".format(name, extension)
-        fig = plt.figure(figure)
-        size = plt.rcParams.get('figure.figsize')
-        fig.set_size_inches(0.7*size[0], 0.7*size[1], forward=True)
+        name = save_folder + name
+        plt.figure(figure)
         plt.savefig(name, bbox_inches='tight')
         pylog.debug("Saving figure {}...".format(name))
-        fig.set_size_inches(size[0], size[1], forward=True)
 
 
 def save_figures(**kwargs):
