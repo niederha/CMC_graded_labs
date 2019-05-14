@@ -18,8 +18,8 @@ leg_to_leg_coupling = [[21, 22],
                        [21, 22]]
 
 save_folder = 'Arrays\\'
-coupling_weights_file = save_folder + 'coupling_weights.csv'
-phase_bias_file = save_folder + 'phase_bias.csv'
+coupling_weights_file = save_folder + 'Coupling_Weights.csv'
+phase_bias_file = save_folder + 'Phase_Shifts.csv'
 
 
 class FileGenerator:
@@ -36,7 +36,7 @@ class FileGenerator:
         self.coupling_weights = np.zeros([self.n_oscillators, self.n_oscillators])
 
         # Unconnected phases are represented by inf for easier checks
-        self.phase_bias = np.full([self.n_oscillators, self.n_oscillators], inf)
+        self.phase_bias = np.full([self.n_oscillators, self.n_oscillators], 0.)
     
     def generate_weights_file(self):
     
@@ -101,7 +101,3 @@ class FileGenerator:
         # Save as CSV file
         np.savetxt(phase_bias_file, self.phase_bias, delimiter=',')
 
-
-file_generator = FileGenerator()
-file_generator.generate_weights_file()
-file_generator.generate_phase_bias_file()
