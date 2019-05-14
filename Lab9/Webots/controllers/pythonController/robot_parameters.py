@@ -107,6 +107,15 @@ class RobotParameters(dict):
         if parameters.amplitudes is not None:
             self.nominal_amplitudes[:self.n_oscillators_body] = parameters.amplitudes
             #print(self.nominal_amplitudes)
+        elif parameters.amplitudesLimb is not None:
+            self.nominal_amplitudes[:self.n_oscillators_body] = parameters.amplitudesLimb
+            #print(self.nominal_amplitudes)
+            
+            if (parameters.drive <= parameters.dhighLimb and parameters.drive >= parameters.dlowLimb):
+                self.nominal_amplitudes[self.n_oscillators_body:]= parameters.cR1Limb*parameters.drive+parameters.cR0Limb
+            else:
+                self.nominal_amplitudes[self.n_oscillators_body:]= parameters.RsatLimb
+            
         else:
             if (parameters.drive <= parameters.dhighBody and parameters.drive >= parameters.dlowBody):
                 self.nominal_amplitudes[:self.n_oscillators_body]= parameters.cR1Body*parameters.drive+parameters.cR0Body

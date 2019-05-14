@@ -18,6 +18,7 @@ class SimulationParameters(dict):
         self.amplitudes = None
         self.frequency = None
         self.phase_lag_body_limb = None
+        self.amplitudesLimb = None
         # Feel free to add more parameters (ex: MLR drive)
         #self.drive_mlr = 0.1
         #self.drive= 0

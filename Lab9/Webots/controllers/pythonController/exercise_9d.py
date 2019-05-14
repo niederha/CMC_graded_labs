@@ -10,7 +10,7 @@ def exercise_9d1(world, timestep, reset):
     n_joints = 10
     parameter_set = [
         SimulationParameters(
-            simulation_duration=120,
+            simulation_duration=40,
             drive=4,
             #amplitudes=0.5,
             #frequency=1,
@@ -42,13 +42,13 @@ def exercise_9d2(world, timestep, reset):
     n_joints = 10
     parameter_set = [
         SimulationParameters(
-            simulation_duration=120,
+            simulation_duration=40,
             drive=4,
             #amplitudes=0.5,
             #frequency=1,
             #RHead = RHead,
             #RTail = RTail,
-            Backwards = False,
+            Backwards = True,
             phase_lag=2*np.pi/10,
             turnRate=[1,1],
             # ...

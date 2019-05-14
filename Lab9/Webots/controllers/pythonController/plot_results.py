@@ -26,7 +26,7 @@ def plot_body_joints(time, joint_angles, variable='body joint angle',title='Spin
     plt.title(title)
 
 
-def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
+def plot_leg_joints(time, joint_angles, variable='leg joint angle',title='Limb angle evolution'):
     """ Extracts and plots motor output for body joints"""
     nb_legs = 4
     nb_body = joint_angles.shape[1]-nb_legs
@@ -44,7 +44,7 @@ def plot_leg_joints(time, joint_angles, variable='leg joint angle'):
                  label="leg joint " + str(leg_joint_index))
     plt.grid()
     plt.legend()
-    plt.title(variable + " evolution")
+    plt.title(title)
 
 
 def plot_3d_variable(times, variable_log, variable_name):
@@ -261,13 +261,137 @@ def exercise_9d2_plots():
     
     plot_body_joints(times[:10000], joint_angles[:10000], variable='exercise_9d2_spine_angles_plot',title='Spine angle evolution backwards')
 
+def exercise_9f1_plots():
+    
+    link_vel_list = []
+    phase_lag_list = []
+    
+    for sim in range(0,15):
+        with np.load('logs/exercise_9f1/simulation_{0}.npz' .format(sim)) as data:
+            timestep = float(data["timestep"])
+            link_data = data["links"][:, 0, :]
+            phase_lag = data["phase_lag_body_limb"]
+            
+        times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+        phase_lag_list.append(phase_lag)
+
+        pos = link_data
+        vel = np.diff(pos, axis=0, prepend=0)/ timestep
+#        meanvel = np.linalg.norm(pos[-1] -pos[0])/times[-1]
+#        plt.figure()
+#        plt.plot(vel[25:])
+#        vel[vel>0.3] = 0
+#        vel[vel<-0.3] = 0
+#        print(vel[:,0])
+        link_vel_list.append(np.linalg.norm(np.mean(vel[-2400:],axis = 0)))  
+#        link_vel_list.append(meanvel)
+        
+    """Plot the velocity 2d graph"""
+    
+    plt.figure("exercise_9f1_velocity_plot")
+    
+    plt.title("Velocity vs phase lag body limb")
+    
+    X = np.array(phase_lag_list)
+    
+    Y = np.array(link_vel_list)
+    
+    plt.plot(X,Y,label='Velocity')
+    plt.legend()
+    plt.xlabel('phase_lag')
+    plt.ylabel('Velocity [m/s]')
+    
+def exercise_9f2_plots():
+    
+    link_vel_list = []
+    amplitudes_list = []
+    
+    for sim in range(0,15):
+        with np.load('logs/exercise_9f2/simulation_{0}.npz' .format(sim)) as data:
+            timestep = float(data["timestep"])
+            link_data = data["links"][:, 0, :]
+            amplitude = data["amplitudesLimb"]
+            
+        #times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+        amplitudes_list.append(amplitude)
+
+        pos = link_data
+        vel = np.diff(pos, axis=0, prepend=0)/ timestep
+#        plt.figure()
+#        plt.plot(vel[25:])
+#        vel[vel>0.3] = 0
+#        vel[vel<-0.3] = 0
+
+        link_vel_list.append(np.linalg.norm(np.mean(vel[-2400:],axis = 0)))        
+        
+    """Plot the velocity 2d graph"""
+    
+    plt.figure("exercise_9f2_velocity_plot")
+    
+    plt.title("Velocity vs nominal Radius")
+    
+    X = np.array(amplitudes_list)
+    
+    Y = np.array(link_vel_list)
+    
+    plt.plot(X,Y,label='Velocity')
+    plt.legend()
+    plt.xlabel('nominal R')
+    plt.ylabel('Velocity [m/s]')
+    
+
+    
+
+def exercise_9g_plots():
+    
+    with np.load('logs/exercise_9g/simulation_0.npz') as data:
+        timestep = float(data["timestep"])
+        link_data = data["links"][:, 0, :]
+        joints_data = data["joints"]
+
+    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+
+    pos = link_data      
+    
+    """Plot gps trajectory"""
+    
+    plt.figure("exercise_9g_trajectory_plot")
+    plot_trajectory(pos,'Transition')
+
+    """Plot spine angles"""
+    joint_angles = joints_data[:,:,0]
+    plot_body_joints(times, joint_angles, variable='exercise_9g_spine_angles_plot',title='Spine angle evolution g/w/g transition')
+    plt.xlabel('time [s]')
+    plt.axvline(x=14, color="k") 
+    plt.text(14+0.001, -1, "Transition", rotation=-90, color="k")
+    plt.axvline(x=24, color="k") 
+    plt.text(24-2, -1, "Transition", rotation=-90, color="k")
+    plot_leg_joints(times, joint_angles, variable='exercise_9g_limb_angles_plot',title='Limb angle evolution g/w/g transition')
+    plt.xlabel('time [s]')
+    plt.axvline(x=14, color="k") 
+    plt.text(14+0.001, 4, "Transition", rotation=-90, color="k")
+    plt.axvline(x=24, color="k") 
+    plt.text(24-2, 4, "Transition", rotation=-90, color="k")
+    plot_body_joints(pos[:4500,0], joint_angles[:4500], variable='exercise_9g_GW_spine_angles_plot',title='Spine angle evolution ground/water transition')
+    plt.xlabel('x [m]')
+    plot_leg_joints(pos[:4500,0], joint_angles[:4500], variable='exercise_9g_GW_limb_angles_plot',title='Limb angle evolution ground/water transition')
+    plt.xlabel('x [m]')
+    plot_body_joints(pos[5500:,0], joint_angles[5500:], variable='exercise_9g_WG_spine_angles_plot',title='Spine angle evolution water/ground transition')
+    plt.xlabel('x [m]')
+    plt.gca().invert_xaxis()
+    plot_leg_joints(pos[5500:,0], joint_angles[5500:], variable='exercise_9g_WG_limb_angles_plot',title='Limb angle evolution water/ground transition')
+    plt.xlabel('x [m]')
+    plt.gca().invert_xaxis()
 
 def main(save=False):
     """Main"""
     # Load data
-    exercise_9c_plots()
-    exercise_9d1_plots()
-    exercise_9d2_plots()
+    #exercise_9c_plots()
+    #exercise_9d1_plots()
+    #exercise_9d2_plots()
+    exercise_9f1_plots()
+    exercise_9f2_plots()
+    #exercise_9g_plots()
     # Show plots
     if save:
         save_figures()
