@@ -8,12 +8,12 @@ from simulation_parameters import SimulationParameters
 def exercise_9b(world, timestep, reset):
     """Exercise 9b"""
     # Parameters
-    n_joints = 10
+    mlr_drive = 2.  # Experiment for swimming only
 
     parameter_set = [
         SimulationParameters(
             simulation_duration=30,
-            mlr_drive=5.,
+            mlr_drive=mlr_drive,
         )
     ]
 
