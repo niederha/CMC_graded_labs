@@ -8,16 +8,17 @@ from network import SalamanderNetwork
 from save_figures import save_figures
 from parse_args import save_plots
 from simulation_parameters import SimulationParameters
+import plot_results as plt_res
 
 
-def run_network(duration, update=False, drive=0):
+def run_network(duration, update=False, drive=0., gait="swimming"):
     """Run network without Webots and plot results"""
     # Simulation setup
     timestep = 5e-3
     times = np.arange(0, duration, timestep)
     n_iterations = len(times)
     parameters = SimulationParameters(
-        drive=drive,
+        mlr_drive=drive,
         amplitude_gradient=None,
         phase_lag=None,
         turn=None,
@@ -33,16 +34,19 @@ def run_network(duration, update=False, drive=0):
         len(network.state.phases)
     ])
     phases_log[0, :] = network.state.phases
+
     amplitudes_log = np.zeros([
         n_iterations,
         len(network.state.amplitudes)
     ])
     amplitudes_log[0, :] = network.state.amplitudes
+
     freqs_log = np.zeros([
         n_iterations,
         len(network.parameters.freqs)
     ])
     freqs_log[0, :] = network.parameters.freqs
+
     outputs_log = np.zeros([
         n_iterations,
         len(network.get_motor_position_output())
@@ -66,6 +70,7 @@ def run_network(duration, update=False, drive=0):
         freqs_log[i+1, :] = network.parameters.freqs
     toc = time.time()
 
+
     # Network performance
     pylog.info("Time to run simulation for {} steps: {} [s]".format(
         n_iterations,
@@ -73,21 +78,22 @@ def run_network(duration, update=False, drive=0):
     ))
 
     # Implement plots of network results
-    pylog.warning("Implement plots")
+    plt_res.plot_body_joints(times, outputs_log, gait+' body joints')
+    plt_res.plot_leg_joints(times, outputs_log, gait+' leg joints')
 
 
-def main(plot):
+def main(save_fig):
     """Main"""
 
-    run_network(duration=5)
+    run_network(duration=20, drive=1., gait='walking')
+    run_network(duration=20, drive=4., gait='swimming')
 
     # Show plots
-    if plot:
-        plt.show()
-    else:
+    if save_fig:
         save_figures()
+    plt.show()
 
 
 if __name__ == '__main__':
-    main(plot=not save_plots())
+    main(save_fig=True)  # save_plots())
 
