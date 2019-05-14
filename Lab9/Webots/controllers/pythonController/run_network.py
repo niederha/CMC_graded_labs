@@ -70,7 +70,6 @@ def run_network(duration, update=False, drive=0., gait="swimming"):
         freqs_log[i+1, :] = network.parameters.freqs
     toc = time.time()
 
-
     # Network performance
     pylog.info("Time to run simulation for {} steps: {} [s]".format(
         n_iterations,
@@ -80,6 +79,7 @@ def run_network(duration, update=False, drive=0., gait="swimming"):
     # Implement plots of network results
     plt_res.plot_body_joints(times, outputs_log, gait+' body joints')
     plt_res.plot_leg_joints(times, outputs_log, gait+' leg joints')
+    # plt_res.plot_phase_joints(times, phases_log, gait+' phase body joints', gait)
 
 
 def main(save_fig):
