@@ -1,6 +1,7 @@
 """Oscillator network ODE"""
 
 import numpy as np
+from math import cos, isinf
 
 from solvers import euler, rk4
 from robot_parameters import RobotParameters
@@ -21,16 +22,28 @@ def network_ode(_time, state, parameters):
         # d_phase computation
         d_phases[i] = 2*np.pi*parameters.freqs[i]
         for j in range(parameters.n_oscillators):
-            d_phases[i] += amplitudes[j] * parameters.coupling_weights[i, j] *\
-                           np.sin(phases[j]-phases[i]-parameters.phase_bias[i, j])
+            if not isinf(parameters.phase_bias[i, j]):
+                d_phases[i] += amplitudes[j] * parameters.coupling_weights[i, j] *\
+                               np.sin(phases[j]-phases[i]-parameters.phase_bias[i, j])
         # d_amplitude computation
         d_amplitudes[i] = parameters.rates[i] * (parameters.nominal_amplitudes[i]-amplitudes[i])
-
     return np.concatenate([d_phases, d_amplitudes])
 
-def motor_output(phases, amplitudes):
+
+def motor_output(phases, amplitudes, nb_body_joints, nb_legs):
     """Motor output"""
-    return np.zeros_like(phases) + np.zeros_like(amplitudes)
+    joint_angles = np.zeros((nb_body_joints+nb_legs,))
+
+    # Body output computations
+    for i in range(nb_body_joints):
+        joint_angles[i] = amplitudes[i]*(1+cos(phases[i]))
+        joint_angles[i] -= amplitudes[i+nb_body_joints]*(1+cos(phases[i+nb_body_joints]))
+
+    # Leg output computations
+    for i in range(nb_legs):
+        joint_angles[nb_body_joints + i] = amplitudes[nb_body_joints+i] * (1+cos(phases[nb_body_joints+i]))
+
+    return joint_angles
 
 
 class ODESolver(object):
@@ -114,5 +127,6 @@ class SalamanderNetwork(ODESolver):
 
     def get_motor_position_output(self):
         """Get motor position"""
-        return motor_output(self.state.phases, self.state.amplitudes)
+        return motor_output(self.state.phases, self.state.amplitudes, self.parameters.n_body_joints,
+                            self.parameters.n_legs_joints)
 
