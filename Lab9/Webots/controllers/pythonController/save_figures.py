@@ -29,5 +29,5 @@ def save_figures(**kwargs):
     figures = [str(figure) for figure in plt.get_figlabels()]
     pylog.debug("Other files:\n    - " + "\n    - ".join(figures))
     for name in figures:
-        save_figure(name, extensions=kwargs.pop("extensions", ["pdf"]))
+        save_figure(name, extensions=kwargs.pop("extensions", ["png"]))
 
