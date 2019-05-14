@@ -10,12 +10,8 @@ def exercise_9f(world, timestep, reset):
     n_joints = 10
     parameter_set = [
         SimulationParameters(
-            simulation_duration=10,
-            drive=3,
-            amplitudes=[1, 2, 3],
-            phase_lag=np.zeros(n_joints),
-            turn=0,
-            # ...
+            simulation_duration=20,
+            drive=2.,
         )
     ]
 
