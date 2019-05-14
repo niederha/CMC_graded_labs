@@ -74,10 +74,10 @@ def plot_positions(times, link_data):
     plt.ylabel("Distance [m]")
     plt.grid(True)
     
-def plot_velocity(times, velocity):
+def plot_velocity_link(times, velocity):
     """Plot positions"""
     for i, data in enumerate(velocity.T):
-        plt.plot(times, data, label=[i])
+        plt.plot(times[25:], data[25:], label=["vx", "vy", "vz"][i])
     plt.legend()
     plt.xlabel("Time [s]")
     plt.ylabel("Velocity [m/s]")
@@ -138,33 +138,88 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
     cbar.set_label(labels[2])
 
 def exercise_9c_plots():
-    with np.load('logs/exercise_9c/simulation_0.npz') as data:
-        timestep = float(data["timestep"])
-        amplitude = data["amplitudes"]
-        phase_lag = data["phase_lag"]
-        link_data = data["links"][:, 0, :]
-        joints_data = data["joints"]
-    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
     
-    print(joints_data[:,:,1].shape)
-    print(amplitude.shape)
-    print(phase_lag.shape)
-    print(link_data.shape)
-    print(joints_data.shape)
+    link_vel_list = []
+    joint_vel_list = []
+    joint_torque_list = []
+    rhead_list = [] 
+    rtail_list = [] 
+    for sim in range(0,25):
+        with np.load('logs/exercise_9c/simulation_{0}.npz' .format(sim)) as data:
+            timestep = float(data["timestep"])
+            link_data = data["links"][:, 0, :]
+            joints_data = data["joints"]
+            rhead = data["RHead"]
+            rtail = data["RTail"]
+        times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+
+
+        pos = link_data
+        vel = np.diff(pos, axis=0, prepend=0)/ timestep
+        print(np.mean(vel,axis = 0))
+        link_vel_list.append(np.linalg.norm(np.mean(vel,axis = 0)))        
+        
+        rhead_list.append(rhead)
+        rtail_list.append(rtail)
+        
+        joint_velocity = joints_data[:,:,1]
+        joint_vel_list.append(joint_velocity)
     
-    # Plot data
-    #plt.figure("Positions")
-    #plot_positions(times, link_data)
-
-    #plt.figure("Velocity")
-    #plot_velocity(times, joints_data[:,:,1])
-
-    plt.figure("Trajectory")
-    plot_trajectory(link_data)
+        joint_torque = joints_data[:,:,3]
+        joint_torque_list.append(joint_torque)
+        
+    """Plot the velocity 3d graph"""
     
-    #plt.figure("2dPlot")
-    #plot_2d(link_data, ['x','y','z'])
-
+    fig = plt.figure("exercise_9c_velocity_plot")
+    ax = fig.add_subplot(111, projection='3d')
+    
+    plt.title("Velocity vs RHead/RTail")
+    
+    X = np.array(rhead_list)
+    Y = np.array(rtail_list)
+    X = X.reshape((5,5))
+    Y = Y.reshape((5,5))
+    
+    Z = np.array(link_vel_list)
+    
+    Z = Z.reshape((5,5))
+    
+    ax.plot_surface(X,Y, Z, cmap=cm.coolwarm)
+    ax.set_xlabel('RHead')
+    ax.set_ylabel('RTail')
+    ax.set_zlabel('Velocity')
+    
+    """Plot the energy graph"""
+    
+    torque = np.array(joint_torque_list)
+    velocity = np.array(joint_vel_list)
+    print(torque.shape)
+    print(velocity.shape)
+    energy = torque*velocity*timestep
+    print(energy.shape)
+    energy = np.sum(energy,axis = 1)
+    print(energy.shape)
+    energy = np.sum(energy,axis = 1)
+    print(energy.shape)
+    
+    fig = plt.figure("exercise_9c_energy_plot")
+    ax = fig.add_subplot(111, projection='3d')
+    
+    plt.title("Energy vs RHead/RTail")
+    
+    X = np.array(rhead_list)
+    Y = np.array(rtail_list)
+    X = X.reshape((5,5))
+    Y = Y.reshape((5,5))
+    
+    Z = energy
+    
+    Z = Z.reshape((5,5))
+    
+    ax.plot_surface(X,Y, Z, cmap=cm.coolwarm)
+    ax.set_xlabel('RHead')
+    ax.set_ylabel('RTail')
+    ax.set_zlabel('Energy')
 
 def main(plot=True):
     """Main"""
