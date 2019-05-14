@@ -9,6 +9,8 @@ from save_figures import save_figures
 from parse_args import save_plots
 from simulation_parameters import SimulationParameters
 import plot_results as plt_res
+import neural_net_matrice_generation as nnmg
+from tqdm import tqdm
 
 
 def run_network(duration, update=False, drive=1., gait="Walking"):
@@ -74,19 +76,28 @@ def run_network(duration, update=False, drive=1., gait="Walking"):
     ))
 
     plt_res.plot_body_joints(times, outputs_log, gait + ' body joints')
-    plt_res.plot_leg_joints(times, outputs_log, gait + ' leg joints')
+    # plt_res.plot_leg_joints(times, outputs_log, gait + ' leg joints')
 
     
 def main(save):
     """Main"""
-
-    run_network(duration=20, drive=1., gait='Walking')
-    run_network(duration=20, drive=4., gait='Swimming')
+    weak_couplings = np.arange(10, 50, 10)
+    strong_couplings = np.arange(10, 210, 10)
+    file_generator = nnmg.FileGenerator()
+    file_generator.generate_phase_bias_file()
+    for strong_coupling in tqdm(strong_couplings):
+        for weak_coupling in weak_couplings:
+            SimulationParameters.weak_coupling = weak_coupling
+            SimulationParameters.strong_coupling = strong_coupling
+            file_generator = nnmg.FileGenerator()
+            file_generator.generate_weights_file()
+            run_network(duration=10, drive=1., gait='Walking ' + str(weak_coupling) + " " + str(strong_coupling))
+    # run_network(duration=20, drive=4., gait='Swimming')
 
     # Show plots
     if save:
         save_figures()
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':
