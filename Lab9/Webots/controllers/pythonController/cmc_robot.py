@@ -3,7 +3,9 @@
 import numpy as np
 from network import SalamanderNetwork
 from experiment_logger import ExperimentLogger
+"""
 from controller import Keyboard
+"""
 class SalamanderCMC(object):
     """Salamander robot for CMC"""
 
@@ -65,7 +67,7 @@ class SalamanderCMC(object):
         )
         
         #GPS stuff
-        
+        """
         self.waterPosx = 0
         self.NetworkParameters = self.network.parameters
         self.SimulationParameters = parameters
@@ -73,7 +75,7 @@ class SalamanderCMC(object):
         self.keyboard = Keyboard()
         self.keyboard.enable(samplingPeriod=100)
         self.lastkey = 0
-        
+        """
 
     def log_iteration(self):
         """Log state"""
@@ -148,7 +150,7 @@ class SalamanderCMC(object):
                 positions[self.N_BODY_JOINTS+i] - np.pi/2
             )
         
-        
+        """
         key=self.keyboard.getKey()
         if (key==ord('A') and key is not self.lastkey):
             print('Turning left')
@@ -183,7 +185,7 @@ class SalamanderCMC(object):
             
             self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
             self.NetworkParameters.set_frequencies(self.SimulationParameters)
-        
+        """
         # Log data
         self.log_iteration()
 
