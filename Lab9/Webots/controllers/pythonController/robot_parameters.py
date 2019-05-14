@@ -29,7 +29,8 @@ class RobotParameters(dict):
         self.phase_bias = np.zeros([self.n_oscillators, self.n_oscillators])
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
-        self.mlr_drive = 1.
+        self.mlr_drive = parameters.mlr_drive
+        self.phase_lag = parameters.phase_lag
         self.update(parameters)
 
     def update(self, parameters):
@@ -68,6 +69,15 @@ class RobotParameters(dict):
     def set_phase_bias(self, parameters):
         """Set phase bias"""
         self.phase_bias = np.genfromtxt(nnmg.phase_bias_file, delimiter=',')
+
+        # Change body phase lag for Ex9b
+        """if self.phase_lag is not None:
+            for i in range(self.n_oscillators_body):
+                # Neighbour coupling
+                if i != (self.n_oscillators_body / 2) - 1 and i < (self.n_oscillators_body - 1):
+                    self.phase_bias[i][i + 1] = -self.phase_lag
+                    self.phase_bias[i + 1][i] = self.phase_lag
+            # All other coupling remain identical"""
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
