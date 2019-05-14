@@ -386,12 +386,12 @@ def exercise_9g_plots():
 def main(save=False):
     """Main"""
     # Load data
-    #exercise_9c_plots()
-    #exercise_9d1_plots()
-    #exercise_9d2_plots()
+    exercise_9c_plots()
+    exercise_9d1_plots()
+    exercise_9d2_plots()
     exercise_9f1_plots()
     exercise_9f2_plots()
-    #exercise_9g_plots()
+    exercise_9g_plots()
     # Show plots
     if save:
         save_figures()
