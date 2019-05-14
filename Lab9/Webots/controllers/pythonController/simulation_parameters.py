@@ -30,12 +30,13 @@ class SimulationParameters(dict):
         self.limb_saturation = kwargs.pop("limb_sat", self.default_limb_saturation_drives)
         self.body_saturation = kwargs.pop("body_sat", self.default_body_saturation_drives)
         self.mlr_drive = kwargs.pop('mlr_drive', 1.)
+        self.phase_lag = kwargs.pop('phase_lag', None)
         self.v_sat = 0.
         self.R_sat = 0.
 
         self.c_freq_body = [0.2, 0.3]  # Gave up on implementing default parameters. Useless in this scope anyway
         self.c_freq_limb = [0.2, 0.0]
-        self.c_R_body = [0.065, 0.196]
+        self.c_R_body = [0.065, 0.13]
         self.c_R_limb = [0.131, 0.131]
 
         self.update(kwargs)  # NOTE: This overrides the previous declarations
