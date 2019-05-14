@@ -20,7 +20,7 @@ def main():
     timestep = int(world.getBasicTimeStep())
 
     # Get and control initial state of salamander
-    reset = RobotResetControl(world, n_joints)
+    reset = RobotResetControl(world)
 
     # Simulation arguments
     arguments = world.getControllerArguments()

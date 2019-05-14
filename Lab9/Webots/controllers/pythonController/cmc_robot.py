@@ -149,20 +149,29 @@ class SalamanderCMC(object):
 
         key=self.keyboard.getKey()
         if (key==ord('A') and key is not self.lastkey):
-            print('a pressed')
-            self.SimulationParameters.turnRate = [0.5,1]
+            print('Turning left')
+            self.SimulationParameters.turnRate = [0.8,1]
             self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
             self.lastkey = key
         if (key==ord('D') and key is not self.lastkey):
-            print('d pressed')
-            self.SimulationParameters.turnRate = [1,0.5]
+            print('Turning right')
+            self.SimulationParameters.turnRate = [1,0.8]
             self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
             self.lastkey = key
         if (key==ord('W') and key is not self.lastkey):
-            print('w pressed')
+            print('Going forward')
             self.SimulationParameters.turnRate = [1,1]
             self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
+            self.SimulationParameters.Backwards = False
+            self.NetworkParameters.set_phase_bias(self.SimulationParameters)
             self.lastkey = key
+            
+        if (key==ord('S') and key is not self.lastkey):
+            print('Going backward')
+            self.SimulationParameters.Backwards = True
+            self.NetworkParameters.set_phase_bias(self.SimulationParameters)
+            self.lastkey = key
+            
         gpsPos = self.gps.getValues()
         
         if gpsPos[0] < self.waterPosx+2 and gpsPos[0] > self.waterPosx -0.5:

@@ -40,7 +40,7 @@ def motor_output(phases, amplitudes):
     for i in range(motors_len,14):
         
         if amplitudes[motors_len+i] < 0.0000001:
-            
+            phases[motors_len+i] = 0
             dmotor[i] = 0
         else:
             dmotor[i] = -phases[motors_len+i]
