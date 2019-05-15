@@ -11,26 +11,38 @@ def exercise_9f(world, timestep, reset):
     
     #ex9f1
     
+#    parameter_set = [
+#        SimulationParameters(
+#            simulation_duration=10,
+#            drive=1,
+#            amplitudesLimb=0.3,
+#            phase_lag_body_limb=phase_lag_body_limb,
+#        )
+#        for phase_lag_body_limb in np.linspace(0,2*np.pi,15)
+#    ]
+    
+    #ex9f2
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,
             drive=1,
-            amplitudesLimb=0.3,
-            phase_lag_body_limb=phase_lag_body_limb,
+
+            amplitudesLimb=amplitude,
+            #phase_lag_body_limb = 4.03
         )
-        for phase_lag_body_limb in np.linspace(0,2*np.pi,15)
+        for amplitude in np.linspace(0,0.5,15)
     ]
     
-    #ex9f2
+    #normal walking
 #    parameter_set = [
 #        SimulationParameters(
 #            simulation_duration=10,
 #            drive=1,
 #
-#            amplitudesLimb=amplitude,
-# 
+#            #amplitudesLimb=amplitude,
+#            #phase_lag_body_limb = 3.14
 #        )
-#        for amplitude in np.linspace(0,0.5,15)
+#        #for amplitude in np.linspace(0,0.5,15)
 #    ]
 
     # Grid search
@@ -41,6 +53,6 @@ def exercise_9f(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/exercise_9f1/simulation_{}.npz".format(simulation_i)
+            logs="./logs/exercise_9f2/simulation_{}.npz".format(simulation_i)
         )
 

@@ -80,8 +80,8 @@ def run_network(duration, update=False, drive=1., gait="Walking"):
 def main(save):
     """Main"""
 
-    run_network(duration=20, drive=1., gait='Walking')
-    run_network(duration=20, drive=4., gait='Swimming')
+    run_network(duration=25, drive=1., gait='Walking')
+    #run_network(duration=15, drive=4., gait='Swimming')
 
     # Show plots
     if save:
@@ -90,5 +90,5 @@ def main(save):
 
 
 if __name__ == '__main__':
-    main(save=True)
+    main(save=False)
 

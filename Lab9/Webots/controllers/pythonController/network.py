@@ -40,8 +40,11 @@ def motor_output(phases, amplitudes):
     for i in range(motors_len,14):
         
         if amplitudes[motors_len+i] < 0.0000001:
-            phases[motors_len+i] = 0
-            dmotor[i] = 0
+#            phases[motors_len+i] = 0
+            dmotor[i] = phases[motors_len+i] -phases[motors_len+i]%(np.pi)
+#            current = phases[motors_len+i]
+#            phases[motors_len+i] = int(current/(2*np.pi))*2*np.pi
+#            dmotor[i] = -int(current/(2*np.pi))*2*np.pi
         else:
             dmotor[i] = -phases[motors_len+i]
             

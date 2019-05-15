@@ -283,7 +283,7 @@ def exercise_9f1_plots():
 #        vel[vel>0.3] = 0
 #        vel[vel<-0.3] = 0
 #        print(vel[:,0])
-        link_vel_list.append(np.linalg.norm(np.mean(vel[-2400:],axis = 0)))  
+        link_vel_list.append((np.mean(vel[-2400:,0],axis = 0)))  
 #        link_vel_list.append(meanvel)
         
     """Plot the velocity 2d graph"""
@@ -295,7 +295,8 @@ def exercise_9f1_plots():
     X = np.array(phase_lag_list)
     
     Y = np.array(link_vel_list)
-    
+    print(np.argmax(Y))
+    print(X[np.argmax(Y)])
     plt.plot(X,Y,label='Velocity')
     plt.legend()
     plt.xlabel('phase_lag')
@@ -322,7 +323,7 @@ def exercise_9f2_plots():
 #        vel[vel>0.3] = 0
 #        vel[vel<-0.3] = 0
 
-        link_vel_list.append(np.linalg.norm(np.mean(vel[-2400:],axis = 0)))        
+        link_vel_list.append(np.linalg.norm(np.mean(vel[-2400:,0],axis = 0)))        
         
     """Plot the velocity 2d graph"""
     
@@ -339,9 +340,29 @@ def exercise_9f2_plots():
     plt.xlabel('nominal R')
     plt.ylabel('Velocity [m/s]')
     
-
+def exercise_9f_walking_plots():
     
+    with np.load('logs/test/simulation_0.npz') as data:
+        timestep = float(data["timestep"])
+        link_data = data["links"][:, 0, :]
+        joints_data = data["joints"]
 
+    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+
+    """Plot spine angles"""
+    joint_angles = joints_data[:,:,0]
+    plot_body_joints(times, joint_angles, variable='exercise_9f_walking_spine_angles_plot',title='Spine angle evolution walking')
+    plot_leg_joints(times, joint_angles, variable='exercise_9f_walking_limb_angles_plot',title='Limb angle evolution walking')
+    #print(np.argmin(joint_angles[-600:-100,:10], axis=0))
+    time_lags = times[-750+np.argmin(joint_angles[-750:-250,:10], axis=0)]
+    time_lags_max = times[-750+np.argmax(joint_angles[-750:-250,:10], axis=0)]
+    total_time_lag = time_lags[-1]-time_lags[0]
+    period = (time_lags_max[0]-time_lags[0])*2
+    print(period)
+    lag = total_time_lag/10/period
+    print(lag*2*np.pi)
+    
+        
 def exercise_9g_plots():
     
     with np.load('logs/exercise_9g/simulation_0.npz') as data:
@@ -386,12 +407,13 @@ def exercise_9g_plots():
 def main(save=False):
     """Main"""
     # Load data
-    exercise_9c_plots()
-    exercise_9d1_plots()
-    exercise_9d2_plots()
-    exercise_9f1_plots()
-    exercise_9f2_plots()
-    exercise_9g_plots()
+    #exercise_9c_plots()
+    #exercise_9d1_plots()
+    #exercise_9d2_plots()
+    #exercise_9f_walking_plots()
+    #exercise_9f1_plots()
+    #exercise_9f2_plots()
+    #exercise_9g_plots()
     # Show plots
     if save:
         save_figures()

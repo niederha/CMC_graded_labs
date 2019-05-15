@@ -54,7 +54,7 @@ class RobotParameters(dict):
                 self.freqs[self.n_oscillators_body:]= parameters.cf1Limb*parameters.drive+parameters.cf0Limb
             else:
                 self.freqs[self.n_oscillators_body:]= parameters.fsatLimb
-        
+        print('Frequencies: {}'.format(self.freqs))
             
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
@@ -83,18 +83,18 @@ class RobotParameters(dict):
                     self.phase_bias[i + 1][i] = parameters.phase_lag
             # All other coupling remain identical
         if parameters.phase_lag_body_limb is not None:
-            leg_to_body_coupling = [[0, 1, 2, 3, 4],
-                        [10, 11, 12, 13, 14],
-                        [5, 6, 7, 8, 9],
-                        [15, 16, 17, 18, 19]]
+            leg_to_body_coupling = [[1, 2, 3, 4,5],
+                        [11, 12, 13, 14,15],
+                        [6, 7, 8, 9],
+                        [16, 17, 18, 19]]
             
             for i in range(self.n_oscillators_legs):
                 for j in leg_to_body_coupling[i][:]:
-                    self.phase_bias[self.n_oscillators_body + i][j] = parameters.phase_lag_body_limb
+                    self.phase_bias[j][self.n_oscillators_body + i] = parameters.phase_lag_body_limb
                     
         if parameters.Backwards:
             self.phase_bias *= -1 
-
+        
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
@@ -132,4 +132,6 @@ class RobotParameters(dict):
         gradient[:self.n_body_joints] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[0]
         gradient[self.n_body_joints:self.n_oscillators_body] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[1]      
         self.nominal_amplitudes *= gradient 
+        
+        print('nominal Amplitudes: {}'.format(self.nominal_amplitudes))
 
