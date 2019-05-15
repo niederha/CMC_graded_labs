@@ -342,7 +342,7 @@ def exercise_9f2_plots():
     
 def exercise_9f_walking_plots():
     
-    with np.load('logs/test/simulation_0.npz') as data:
+    with np.load('logs/exercise_9f_walking/simulation_0.npz') as data:
         timestep = float(data["timestep"])
         link_data = data["links"][:, 0, :]
         joints_data = data["joints"]
@@ -383,24 +383,24 @@ def exercise_9g_plots():
     joint_angles = joints_data[:,:,0]
     plot_body_joints(times, joint_angles, variable='exercise_9g_spine_angles_plot',title='Spine angle evolution g/w/g transition')
     plt.xlabel('time [s]')
-    plt.axvline(x=14, color="k") 
-    plt.text(14+0.001, -1, "Transition", rotation=-90, color="k")
-    plt.axvline(x=24, color="k") 
-    plt.text(24-2, -1, "Transition", rotation=-90, color="k")
+    plt.axvline(x=14.5, color="k") 
+    plt.text(14.5+0.001, -1, "Transition", rotation=-90, color="k")
+    plt.axvline(x=18, color="k") 
+    plt.text(18-2, -1, "Transition", rotation=-90, color="k")
     plot_leg_joints(times, joint_angles, variable='exercise_9g_limb_angles_plot',title='Limb angle evolution g/w/g transition')
     plt.xlabel('time [s]')
-    plt.axvline(x=14, color="k") 
-    plt.text(14+0.001, 4, "Transition", rotation=-90, color="k")
-    plt.axvline(x=24, color="k") 
-    plt.text(24-2, 4, "Transition", rotation=-90, color="k")
-    plot_body_joints(pos[:4500,0], joint_angles[:4500], variable='exercise_9g_GW_spine_angles_plot',title='Spine angle evolution ground/water transition')
+    plt.axvline(x=14.5, color="k") 
+    plt.text(14.5+0.001, 4, "Transition", rotation=-90, color="k")
+    plt.axvline(x=18, color="k") 
+    plt.text(18-2, 4, "Transition", rotation=-90, color="k")
+    plot_body_joints(pos[:int(14/timestep),0], joint_angles[:int(14/timestep)], variable='exercise_9g_GW_spine_angles_plot',title='Spine angle evolution ground/water transition')
     plt.xlabel('x [m]')
-    plot_leg_joints(pos[:4500,0], joint_angles[:4500], variable='exercise_9g_GW_limb_angles_plot',title='Limb angle evolution ground/water transition')
+    plot_leg_joints(pos[:int(14/timestep),0], joint_angles[:int(14/timestep)], variable='exercise_9g_GW_limb_angles_plot',title='Limb angle evolution ground/water transition')
     plt.xlabel('x [m]')
-    plot_body_joints(pos[5500:,0], joint_angles[5500:], variable='exercise_9g_WG_spine_angles_plot',title='Spine angle evolution water/ground transition')
+    plot_body_joints(pos[int(18/timestep):,0], joint_angles[int(18/timestep):], variable='exercise_9g_WG_spine_angles_plot',title='Spine angle evolution water/ground transition')
     plt.xlabel('x [m]')
     plt.gca().invert_xaxis()
-    plot_leg_joints(pos[5500:,0], joint_angles[5500:], variable='exercise_9g_WG_limb_angles_plot',title='Limb angle evolution water/ground transition')
+    plot_leg_joints(pos[int(18/timestep):,0], joint_angles[int(18/timestep):], variable='exercise_9g_WG_limb_angles_plot',title='Limb angle evolution water/ground transition')
     plt.xlabel('x [m]')
     plt.gca().invert_xaxis()
 

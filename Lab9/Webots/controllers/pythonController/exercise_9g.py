@@ -12,7 +12,7 @@ def exercise_9g(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=40,
-            drive=5,
+            drive=2,
         )
     ]
 
@@ -24,5 +24,5 @@ def exercise_9g(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/test/simulation_{}.npz".format(simulation_i)
+            logs="./logs/exercise_9g/simulation_{}.npz".format(simulation_i)
         )

@@ -156,12 +156,12 @@ class SalamanderCMC(object):
         key=self.keyboard.getKey()
         if (key==ord('A') and key is not self.lastkey):
             print('Turning left')
-            self.SimulationParameters.turnRate = [0.8,1]
+            self.SimulationParameters.turnRate = [0.5,1]
             self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
             self.lastkey = key
         if (key==ord('D') and key is not self.lastkey):
             print('Turning right')
-            self.SimulationParameters.turnRate = [1,0.8]
+            self.SimulationParameters.turnRate = [1,0.5]
             self.NetworkParameters.set_nominal_amplitudes(self.SimulationParameters)
             self.lastkey = key
         if (key==ord('W') and key is not self.lastkey):

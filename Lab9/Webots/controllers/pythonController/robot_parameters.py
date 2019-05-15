@@ -54,7 +54,6 @@ class RobotParameters(dict):
                 self.freqs[self.n_oscillators_body:]= parameters.cf1Limb*parameters.drive+parameters.cf0Limb
             else:
                 self.freqs[self.n_oscillators_body:]= parameters.fsatLimb
-        print('Frequencies: {}'.format(self.freqs))
             
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
@@ -133,5 +132,4 @@ class RobotParameters(dict):
         gradient[self.n_body_joints:self.n_oscillators_body] = np.linspace(parameters.RHead,parameters.RTail,self.n_body_joints)*parameters.turnRate[1]      
         self.nominal_amplitudes *= gradient 
         
-        print('nominal Amplitudes: {}'.format(self.nominal_amplitudes))
 
