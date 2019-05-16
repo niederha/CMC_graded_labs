@@ -59,7 +59,7 @@ class FileGenerator:
         # region Limb to body coupling
         for i in range(self.n_oscillators_legs):
             for j in leg_to_body_coupling[i][:]:
-                self.coupling_weights[self.n_oscillators_body + i][j] = self.parameters.strong_coupling
+                self.coupling_weights[j][self.n_oscillators_body + i] = self.parameters.strong_coupling
         # endregion
 
         # Save as CSV file
@@ -93,8 +93,13 @@ class FileGenerator:
         # region Limb to body coupling
         for i in range(self.n_oscillators_legs):
             for j in leg_to_body_coupling[i][:]:
-                self.phase_bias[self.n_oscillators_body + i][j] = in_anti_phase
+                self.phase_bias[j][self.n_oscillators_body + i] = in_anti_phase
         # endregion
 
         # Save as CSV file
         np.savetxt(phase_bias_file, self.phase_bias, delimiter=',')
+
+
+file_generator = FileGenerator()
+file_generator.generate_phase_bias_file()
+file_generator.generate_weights_file()
