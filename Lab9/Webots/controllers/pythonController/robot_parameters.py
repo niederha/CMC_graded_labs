@@ -72,6 +72,7 @@ class RobotParameters(dict):
 
         # Change body phase lag for Ex9b
         if self.phase_lag is not None:
+            pylog.info('Phase lag changed.')
             for i in range(self.n_oscillators_body):
                 # Neighbour coupling
                 if i != (self.n_oscillators_body / 2) - 1 and i < (self.n_oscillators_body - 1):
