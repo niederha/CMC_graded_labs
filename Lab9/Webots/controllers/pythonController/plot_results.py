@@ -249,7 +249,7 @@ def exercise_9c_plots():
     joint_torque_list = []
     rhead_list = [] 
     rtail_list = [] 
-    for sim in range(0,25):
+    for sim in range(0,100):
         with np.load('logs/exercise_9c/simulation_{0}.npz' .format(sim)) as data:
             timestep = float(data["timestep"])
             link_data = data["links"][:, 0, :]
@@ -282,17 +282,23 @@ def exercise_9c_plots():
     
     X = np.array(rhead_list)
     Y = np.array(rtail_list)
-    X = X.reshape((5,5))
-    Y = Y.reshape((5,5))
+    X = X.reshape((10,10))
+    Y = Y.reshape((10,10))
     
     Z = np.array(link_vel_list)
     
-    Z = Z.reshape((5,5))
+    Z = Z.reshape((10,10))
     
     ax.plot_surface(X,Y, Z, cmap=cm.coolwarm)
     ax.set_xlabel('RHead')
     ax.set_ylabel('RTail')
     ax.set_zlabel('Velocity [m/s]')
+    
+    
+    print('Max velocity: {}'.format(np.max(Z)))
+    print(np.argmax(Z))
+    print('RHead: {}'.format(X.flatten()[np.argmax(Z)]))
+    print('RTail: {}'.format(Y.flatten()[np.argmax(Z)]))
     
     """Plot the energy graph"""
     
@@ -311,14 +317,14 @@ def exercise_9c_plots():
     
     plt.title("Energy vs RHead/RTail")
     
-    X = np.array(rhead_list)
-    Y = np.array(rtail_list)
-    X = X.reshape((5,5))
-    Y = Y.reshape((5,5))
-    
+#    X = np.array(rhead_list)
+#    Y = np.array(rtail_list)
+#    X = X.reshape((5,5))
+#    Y = Y.reshape((5,5))
+#    
     Z = energy
     
-    Z = Z.reshape((5,5))
+    Z = Z.reshape((10,10))
     
     ax.plot_surface(X,Y, Z, cmap=cm.coolwarm)
     ax.set_xlabel('RHead')
@@ -372,7 +378,7 @@ def exercise_9f1_plots():
     link_vel_list = []
     phase_lag_list = []
     
-    for sim in range(0,15):
+    for sim in range(0,30):
         with np.load('logs/exercise_9f1/simulation_{0}.npz' .format(sim)) as data:
             timestep = float(data["timestep"])
             link_data = data["links"][:, 0, :]
@@ -413,7 +419,7 @@ def exercise_9f2_plots():
     link_vel_list = []
     amplitudes_list = []
     
-    for sim in range(0,15):
+    for sim in range(0,30):
         with np.load('logs/exercise_9f2/simulation_{0}.npz' .format(sim)) as data:
             timestep = float(data["timestep"])
             link_data = data["links"][:, 0, :]
@@ -440,6 +446,9 @@ def exercise_9f2_plots():
     X = np.array(amplitudes_list)
     
     Y = np.array(link_vel_list)
+    
+    print(np.argmax(Y))
+    print(X[np.argmax(Y)])
     
     plt.plot(X,Y,label='Velocity')
     plt.legend()
@@ -513,8 +522,9 @@ def exercise_9g_plots():
 def main(save=False):
     """Main"""
     # Load data
-    Exercise_9b_plot_gridsearch_speed()
-    Exercise_9b_plot_gridsearch_energy()
+    #Done
+    #Exercise_9b_plot_gridsearch_speed()
+    #Exercise_9b_plot_gridsearch_energy()
     ###Exercise_9b_plot_gridsearch_performance()
     
     #exercise_9c_plots()
@@ -524,7 +534,7 @@ def main(save=False):
     
     #exercise_9f_walking_plots()
     #exercise_9f1_plots()
-    #exercise_9f2_plots()
+    exercise_9f2_plots()
     
     #exercise_9g_plots()
     

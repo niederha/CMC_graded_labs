@@ -12,17 +12,17 @@ def exercise_9c(world, timestep, reset):
         SimulationParameters(
             simulation_duration=10,
             drive=4,
-            amplitudes=0.5,
+            amplitudes=0.28,
             frequency=1,
             RHead = RHead,
             RTail = RTail,
-            Backwards = False,
-            phase_lag=2*np.pi/10,
-            turnRate=[1,1],
+            #Backwards = False,
+            #phase_lag=2*np.pi/10,
+            #turnRate=[1,1],
             # ...
         )
-        for RHead in np.linspace(0,1, 5)
-        for RTail in np.linspace(0,1, 5)
+        for RHead in np.linspace(0,1, 10)
+        for RTail in np.linspace(0,1, 10)
     ]
 
     # Grid search
