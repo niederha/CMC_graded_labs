@@ -38,8 +38,8 @@ class SimulationParameters(dict):
         self.cR0Limb = 0.131
         self.cf1Body = 0.2
         self.cf0Body = 0.3
-        self.cR1Body = 0.065*8/10
-        self.cR0Body = 0.196*8/10
+        self.cR1Body = 0.065#*8/10
+        self.cR0Body = 0.196#*8/10
         
         self.fsatBody = 0.0
         self.fsatLimb = 0.0
