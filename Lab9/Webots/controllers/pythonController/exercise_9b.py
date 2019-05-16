@@ -11,18 +11,18 @@ def exercise_9b(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,
-            drive=4,
-            amplitudes=amplitude,
+            drive=2,
+            amplitudes=0.27,
             frequency=1,
             RHead = 1,
             RTail = 1,
             Backwards = False,
-            phase_lag=phase_lag,
+            phase_lag=0.27,
             turnRate=[1,1],
             # ...
         )
-        for amplitude in np.linspace(0.1,0.5, 10)
-        for phase_lag in np.linspace(0, 3, 30)
+        #for amplitude in np.linspace(0.1,0.5, 10)
+        #for phase_lag in np.linspace(0, 3, 30)
     ]
 
     # Grid search

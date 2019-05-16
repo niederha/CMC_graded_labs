@@ -61,9 +61,9 @@ class RobotParameters(dict):
         #pylog.warning("Coupling weights must be set")
 
         if(platform.system() == 'Linux'):
-            self.coupling_weights = genfromtxt('Arrays/Coupling_Weights.csv', delimiter=',')
+            self.coupling_weights = np.transpose(genfromtxt('Arrays/Coupling_Weights.csv', delimiter=','))
         else:
-            self.coupling_weights = genfromtxt('Arrays\\Coupling_Weights.csv', delimiter=',')
+            self.coupling_weights = np.transpose(genfromtxt('Arrays\\Coupling_Weights.csv', delimiter=','))
 
     def set_phase_bias(self, parameters):
         """Set phase bias"""

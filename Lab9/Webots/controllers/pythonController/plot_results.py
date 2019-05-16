@@ -12,6 +12,7 @@ from parse_args import save_plots
 from mpl_toolkits.mplot3d import Axes3D  # Module for 3D plots
 from matplotlib import cm  # Module for color maps
 
+plt.close("all")
 
 def plot_body_joints(time, joint_angles, variable='body joint angle'):
     """ Extracts and plots motor output for body joints"""
@@ -141,41 +142,36 @@ def Exercise_9b_plot_gridsearch_speed():
     amplitudes=[]
     phase_lags=[]
     
-    for i in range(0,25):
-        path='logs/exercise_9b/simulation_'+str(i)+'.npz'
+    for i in range(0,300):
+        path='logs/exercise_9b_300/simulation_'+str(i)+'.npz'
         with np.load(path) as data:
             timestep = float(data["timestep"])
             position = data["links"][:, 0, :]
-            phase_lag_data = data["phase_lag"]
-            amplitudes_data = data["amplitudes"]
+
             
         xvelocity = np.diff(position[:,0], axis=0) / timestep     
         yvelocity = np.diff(position[:,1], axis=0) / timestep
         meanspeed= np.append(meanspeed,np.mean(xvelocity)+np.mean(yvelocity))
-        amplitudes = np.append(amplitudes,amplitudes_data)
-        phase_lags = np.append(phase_lags,phase_lag_data)
+
         
-    meanspeed=np.reshape(meanspeed,(5,5))  
+    meanspeed=np.reshape(meanspeed,(10,30))  
   
-     
-
-    # 3D data containers
-    amplitudes_3d = np.zeros_like(meanspeed)
-    phase_lags_3d = np.zeros_like(meanspeed)
-
-    phase_lags_3d = np.reshape(phase_lags,(5,5))
-    amplitudes_3d = np.reshape(amplitudes,(5,5))
+    phase_lags_3d, amplitudes_3d = np.meshgrid(np.linspace(0, 3, 30),np.linspace(0.1,0.5, 10))
+    
+    
 
     # 3D plots
     fig = plt.figure("9b_SpeedPhaseLagsAmplitudes")
     plt.title("Speed")
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(phase_lags_3d, amplitudes_3d, meanspeed, cmap=cm.coolwarm)
-    ax.set_xlabel('phase lag')
+    ax.plot_surface(phase_lags_3d, amplitudes_3d, meanspeed, cmap=cm.coolwarm, antialiased=False)
+    ax.set_xlabel('phase lag [rad]')
     ax.set_ylabel('oscillation amplitude')
-    ax.set_zlabel("Robot Speed")
-    print(np.argmax(meanspeed,axis=0))
-    print(np.argmax(meanspeed,axis=1))
+    ax.set_zlabel("Robot Speed [m/s]")
+    
+    
+    print(np.where(meanspeed == meanspeed.max()))
+    print(np.max(meanspeed))
 
     
 def Exercise_9b_plot_gridsearch_energy():
@@ -184,39 +180,70 @@ def Exercise_9b_plot_gridsearch_energy():
     amplitudes=[]
     phase_lags=[]
     
-    for i in range(0,25):
-        path='logs/exercise_9b/simulation_'+str(i)+'.npz'
+    for i in range(0,300):
+        path='logs/exercise_9b_300/simulation_'+str(i)+'.npz'
         with np.load(path) as data:
             timestep = float(data["timestep"])
             velocities = data["joints"][:, :, 1]
             torques = data["joints"][:,:,3]
-            phase_lag_data = data["phase_lag"]
-            amplitudes_data = data["amplitudes"]
-        
-        amplitudes = np.append(amplitudes,amplitudes_data)
-        phase_lags = np.append(phase_lags,phase_lag_data)
+            
+            
         energies = np.append(energies, np.sum(torques*velocities*timestep))
-     
-    energies=np.reshape(energies,(5,5))
+        
+    energies=np.reshape(energies,(10,30)) 
+    phase_lags_3d, amplitudes_3d = np.meshgrid(np.linspace(0, 3, 30),np.linspace(0.1,0.5, 10))
 
-    # 3D data containers
-    amplitudes_3d = np.zeros_like(energies)
-    phase_lags_3d = np.zeros_like(energies)
-
-    phase_lags_3d = np.reshape(phase_lags,(5,5))
-    amplitudes_3d = np.reshape(amplitudes,(5,5))
 
     # 3D plots
     fig = plt.figure("9b_EnergyPhaseLagsAmplitudes")
     plt.title("Speed")
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(phase_lags_3d, amplitudes_3d, energies, cmap=cm.coolwarm)
-    ax.set_xlabel('phase lag')
-    ax.set_ylabel('oscillation amplitude')
-    ax.set_zlabel("Robot Energy consumed")  
+    ax.plot_surface(phase_lags_3d, amplitudes_3d, energies, cmap=cm.coolwarm, antialiased=False)
+    ax.set_xlabel('Phase lag [rad]')
+    ax.set_ylabel('Oscillation amplitude ')
+    ax.set_zlabel("Robot Energy consumed [J]")  
+    print(np.max(energies))
+    print(energies[4,5])
+    
+def Exercise_9b_plot_gridsearch_performance():
+    energies=[]
+    meanspeed=[]
+    amplitudes=[]
+    phase_lags=[]
+    performance=[]
+    
+    for i in range(0,300):
+        path='logs/exercise_9b_300/simulation_'+str(i)+'.npz'
+        with np.load(path) as data:
+            timestep = float(data["timestep"])
+            velocities = data["joints"][:, :, 1]
+            torques = data["joints"][:,:,3]
+            position = data["links"][:, 0, :]
+            
+        energies = np.append(energies, np.sum(torques*velocities*timestep))
+        xvelocity = np.diff(position[:,0], axis=0) / timestep     
+        yvelocity = np.diff(position[:,1], axis=0) / timestep
+        meanspeed= np.append(meanspeed,np.mean(xvelocity)+np.mean(yvelocity))
+        performance=np.append(performance,meanspeed[-1]/energies[-1])
+        
+    performance=np.reshape(performance,(10,30))         
+    
+    phase_lags_3d, amplitudes_3d = np.meshgrid(np.linspace(0, 3, 30),np.linspace(0.1,0.5, 10))
+
+
+    # 3D plots
+    fig = plt.figure("9b_PerformacePhaseLagsAmplitudes")
+    plt.title("Speed")
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(phase_lags_3d, amplitudes_3d, performance, cmap=cm.coolwarm, antialiased=False)
+    ax.set_xlabel('Phase lag [rad]')
+    ax.set_ylabel('Oscillation amplitude ')
+    ax.set_zlabel("Performance (speed/energy)")  
+    print(np.max(energies))
+    print(energies[4,5])
     
 #def Exercise_9b_plot_gridsearch_wavelength():
-#    wavelength=[]
+#    period=[]
 #    position=[]
 #    amplitudes=[]
 #    phase_lags=[]
@@ -225,38 +252,20 @@ def Exercise_9b_plot_gridsearch_energy():
 #        path='logs/exercise_9b/simulation_'+str(i)+'.npz'
 #        with np.load(path) as data:
 #            timestep = float(data["timestep"])
-#            position_data = data["joints"][:, :, 0]
-#            position_data = data["links"][:, 0, :]
+#            position_data = data["joints"][:,0,0]
+#            #position_data = data["links"][:, 0, :]
 #            phase_lag_data = data["phase_lag"]
 #            amplitudes_data = data["amplitudes"]
-#        print(position_data.shape) 
-#        peakind = signal.find_peaks_cwt(-position_data[:,2], np.array([100]), min_snr=5)
+#            frequency = data["frequency"]
+#        #print(position_data.shape) 
+#        plt.figure()
+#        plt.plot(position_data)
+#        peakind = signal.find_peaks_cwt(-position_data, np.array([100]), min_snr=1)
 #        peakind = np.array(peakind)
-#        wavelength=np.append(wavelength,peakind[-2]-peakind[-3])
-#        #plt.plot(range(0,len(position_data[:,2]),position_data[:,2])
-#        #plt.stem(1+0*peakind)       
 #        
-#        amplitudes = np.append(amplitudes,amplitudes_data)
-#        phase_lags = np.append(phase_lags,phase_lag_data)
-#        
-#    wavelength = np.reshape(wavelength,(5,5))
-#    
-#
-#    # 3D data containers
-#    amplitudes_3d = np.zeros_like(wavelenght)
-#    phase_lags_3d = np.zeros_like(wavelength)
-#
-#    phase_lags_3d = np.reshape(phase_lags,(5,5))
-#    amplitudes_3d = np.reshape(amplitudes,(5,5))
-#
-#    # 3D plots
-#    fig = plt.figure("9b_EnergyPhaseLagsAmplitudes")
-#    plt.title("Speed")
-#    ax = fig.add_subplot(111, projection='3d')
-#    ax.plot_surface(phase_lags_3d, amplitudes_3d, wavelength, cmap=cm.coolwarm)
-#    ax.set_xlabel('phase lag')
-#    ax.set_ylabel('oscillation amplitude')
-#    ax.set_zlabel("Wavelength")  
+#        period=np.append(period,(peakind[-2]-peakind[-3])*timestep) 
+#    print(frequency)
+
 
 def main(save=True):
     """Main"""
@@ -276,11 +285,11 @@ def main(save=True):
 
     
     # Plot data
-    plt.figure("Positions")
-    plot_positions(times, link_data)
+    #plt.figure("Positions")
+    #plot_positions(times, link_data)
 
-    #plt.figure("Joints")
-    #plot_positions(times, joints_data[:,1])
+    plt.figure("Joints")
+    plot_positions(times, joints_data[:,1,:3])
 
     #plt.figure("Trajectory")
     #plot_trajectory(link_data)
@@ -289,6 +298,7 @@ def main(save=True):
     #plot_2d(link_data, ['x','y','z'])
     Exercise_9b_plot_gridsearch_speed()
     Exercise_9b_plot_gridsearch_energy()
+    Exercise_9b_plot_gridsearch_performance()
     #Exercise_9b_plot_gridsearch_wavelength()
     # Show plots
     if save:
