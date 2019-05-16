@@ -79,7 +79,7 @@ def run_network(duration, update=False, drive=0., gait="swimming"):
     # Implement plots of network results
     plt_res.plot_body_joints(times, outputs_log, gait+' body joints')
     plt_res.plot_leg_joints(times, outputs_log, gait+' leg joints')
-    # plt_res.plot_phase_joints(times, phases_log, gait+' phase body joints', gait)
+    plt_res.plot_phase_joints(times, phases_log, gait+' phase body joints', gait)
 
 
 def main(save_fig):
