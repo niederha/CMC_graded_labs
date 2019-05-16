@@ -7,10 +7,10 @@ from simulation_parameters import SimulationParameters
 
 
 # Which leg is coupled rto which body oscillator. Had to be hard coded due to incoherent numbering.
-leg_to_body_coupling = [[0, 1, 2, 3, 4],
-                        [10, 11, 12, 13, 14],
-                        [5, 6, 7, 8, 9],
-                        [15, 16, 17, 18, 19]]
+leg_to_body_coupling = [[1, 2, 3, 4, 5],
+                        [11, 12, 13, 14, 15],
+                        [6, 7, 8, 9],
+                        [16, 17, 18, 19]]
 
 leg_to_leg_coupling = [[21, 22],
                        [20, 23],

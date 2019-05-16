@@ -7,7 +7,6 @@ from simulation_parameters import SimulationParameters
 
 def exercise_9b(world, timestep, reset):
     """Exercise 9b"""
-    n_joints = 10
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,

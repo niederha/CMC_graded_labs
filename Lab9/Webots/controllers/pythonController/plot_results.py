@@ -12,25 +12,52 @@ from mpl_toolkits.mplot3d import Axes3D  # Module for 3D plots
 from matplotlib import cm  # Module for color maps
 
 
-def plot_body_joints(time, joint_angles, variable='body joint angle',title='Spine angle evolution'):
+def plot_body_joints(time, joint_angles, file_name='body joint angle', title='Spine angle evolution', offset_mult=1.1,
+                     gait='swimming'):
     """ Extracts and plots motor output for body joints"""
     nb_legs = 4
     nb_body = joint_angles.shape[1]-nb_legs
-    plt.figure(variable.replace(" ", "_"))
+    plt.figure(file_name.replace(" ", "_"))
+
     offset = joint_angles[:, :nb_body].max()-joint_angles[:, :nb_body].min()
+
     for body_joint_index in range(nb_body):
-        plt.plot(time, joint_angles[:, body_joint_index]+1.*(nb_body-body_joint_index-1)*offset,
-                 label="body joint " + str(body_joint_index))
+        if gait == 'walking':
+            offset_add_head = 1.5
+            offset_add_upper_bod = 1.5
+            if body_joint_index == 0:
+                plt.plot(time,
+                         joint_angles[:, body_joint_index]
+                         + offset_mult * (nb_body-body_joint_index-1) * offset
+                         + offset_add_head * offset + offset_add_upper_bod * offset,
+                         label=f'head joint {body_joint_index}')
+            elif body_joint_index < 6:
+                plt.plot(time,
+                         joint_angles[:, body_joint_index]
+                         + offset_mult * (nb_body - body_joint_index - 1) * offset
+                         + offset_add_upper_bod * offset,
+                         label=f'upper body joint {body_joint_index}')
+            else:
+                plt.plot(time,
+                         joint_angles[:, body_joint_index]
+                         + offset_mult * (nb_body - body_joint_index - 1) * offset,
+                         label=f'lower body joint {body_joint_index}')
+        else:
+            plt.plot(time,
+                     joint_angles[:, body_joint_index]
+                     + offset_mult * (nb_body - body_joint_index - 1) * offset,
+                     label=f'body joint {body_joint_index}')
+
     plt.grid()
     plt.legend()
     plt.title(title)
 
 
-def plot_leg_joints(time, joint_angles, variable='leg joint angle',title='Limb angle evolution'):
+def plot_leg_joints(time, joint_angles, file_name='leg joint angle', title='Limb angle evolution', offset_mult=1.1):
     """ Extracts and plots motor output for body joints"""
     nb_legs = 4
     nb_body = joint_angles.shape[1]-nb_legs
-    plt.figure(variable.replace(" ", "_"))
+    plt.figure(file_name.replace(" ", "_"))
 
     # Wrap up legs output:
     joint_angles[:, nb_body:] %= 2 * np.pi
@@ -40,7 +67,7 @@ def plot_leg_joints(time, joint_angles, variable='leg joint angle',title='Limb a
         offset = 0.5
 
     for leg_joint_index in range(nb_legs):
-        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+1.1*(nb_legs-1-leg_joint_index)*offset,
+        plt.plot(time, joint_angles[:, nb_body+leg_joint_index]+offset_mult*(nb_legs-1-leg_joint_index)*offset,
                  label="leg joint " + str(leg_joint_index))
     plt.grid()
     plt.legend()
