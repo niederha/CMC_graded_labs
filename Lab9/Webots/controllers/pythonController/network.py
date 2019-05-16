@@ -18,10 +18,6 @@ def network_ode(_time, state, parameters):
     d_phases = np.zeros_like(phases)
     d_amplitudes = np.zeros_like(amplitudes)
 
-    # Wrap up phases
-    for i, _ in enumerate(phases):
-        phases[i] = np.abs(phases[i] % (2*np.pi))
-
     for i in range(parameters.n_oscillators):
         # d_phase computation
         d_phases[i] = np.pi*parameters.freqs[i]
@@ -45,7 +41,7 @@ def motor_output(phases, amplitudes, nb_body_joints, nb_legs):
 
     # Leg output computations
     for i in range(nb_legs):
-        joint_angles[nb_body_joints + i] = amplitudes[nb_body_joints*2+i] * (np.cos(phases[nb_body_joints*2+i]))
+        joint_angles[nb_body_joints + i] = -phases[nb_body_joints*2+i]
 
     return joint_angles
 
