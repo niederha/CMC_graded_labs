@@ -61,7 +61,7 @@ class FileGenerator:
         # region Limb to body coupling
         for i in range(self.n_oscillators_legs):
             for j in leg_to_body_coupling[i][:]:
-                self.coupling_weights[self.n_oscillators_body + i][j] = self.parameters.strong_coupling
+                self.coupling_weights[j][self.n_oscillators_body + i] = self.parameters.strong_coupling
         # endregion
 
         # Save as CSV file
@@ -78,8 +78,8 @@ class FileGenerator:
         for i in range(self.n_oscillators_body):
             # Neighbour coupling
             if i != (self.n_oscillators_body / 2) - 1 and i < (self.n_oscillators_body - 1):
-                self.phase_bias[i][i + 1] = -phase_lag
-                self.phase_bias[i + 1][i] = phase_lag
+                self.phase_bias[i][i + 1] = phase_lag
+                self.phase_bias[i + 1][i] = -phase_lag
             # Anti-phase coupling
             if i < int(self.n_oscillators_body / 2):
                 self.phase_bias[i][i + int(self.n_oscillators_body / 2)] = in_anti_phase
@@ -95,7 +95,7 @@ class FileGenerator:
         # region Limb to body coupling
         for i in range(self.n_oscillators_legs):
             for j in leg_to_body_coupling[i][:]:
-                self.phase_bias[self.n_oscillators_body + i][j] = in_anti_phase
+                self.phase_bias[j][self.n_oscillators_body + i] = in_anti_phase
         # endregion
 
         # Save as CSV file
