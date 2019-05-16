@@ -46,7 +46,7 @@ def plot_body_joints(time, joint_angles, file_name='body joint angle', title='Sp
             plt.plot(time,
                      joint_angles[:, body_joint_index]
                      + offset_mult * (nb_body - body_joint_index - 1) * offset,
-                     label=f'lower body joint {body_joint_index}')
+                     label=f'body joint {body_joint_index}')
 
     plt.grid()
     plt.legend()
