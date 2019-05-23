@@ -493,8 +493,8 @@ def exercise_9f_walking_plots():
 
     """Plot spine angles"""
     joint_angles = joints_data[:,:,0]
-    plot_body_joints(times, joint_angles, variable='exercise_9f_walking_spine_angles_plot',title='Spine angle evolution walking')
-    plot_leg_joints(times, joint_angles, variable='exercise_9f_walking_limb_angles_plot',title='Limb angle evolution walking')
+    plot_body_joints(times, joint_angles, file_name='exercise_9f_walking_spine_angles_plot',title='Spine angle evolution walking',gait = 'walking')
+    plot_leg_joints(times, joint_angles, file_name='exercise_9f_walking_limb_angles_plot',title='Limb angle evolution walking')
     #print(np.argmin(joint_angles[-600:-100,:10], axis=0))
     time_lags = times[-750+np.argmin(joint_angles[-750:-250,:10], axis=0)]
     time_lags_max = times[-750+np.argmax(joint_angles[-750:-250,:10], axis=0)]
@@ -559,9 +559,9 @@ def main(save=False):
     #exercise_9d1_plots()
     #exercise_9d2_plots()
     
-    #exercise_9f_walking_plots()
+    exercise_9f_walking_plots()
     #exercise_9f1_plots()
-    exercise_9f2_plots()
+    #exercise_9f2_plots()
     
     #exercise_9g_plots()
     
